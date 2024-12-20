@@ -17,6 +17,7 @@ package net.furryplayplace.cottonframework.api.command;
 import com.mojang.brigadier.context.CommandContext;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 @Getter
@@ -25,5 +26,5 @@ public abstract class AbstractCommand {
     private final String name;
     private final int permission;
 
-    public abstract int execute(CommandContext<?> context, ServerPlayerEntity sender);
+    public abstract int execute(CommandContext<ServerCommandSource> context, ServerPlayerEntity sender);
 }

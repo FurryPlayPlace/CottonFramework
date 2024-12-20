@@ -60,6 +60,17 @@ public class CottonFramework implements ModInitializer  {
 
         this.api.pluginManager().getEventBus().register(this);
 
+
+    }
+
+    @Subscribe
+    public void onCottonInitialize(CottonPluginInitialize event) {
+        this.logger.info("Initializing all plugins...");
+
+        this.api.pluginManager().loadPlugins();
+
+        // Start - Registering all commands logic
+
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
             if (environment.dedicated) {
                 dispatcher.register(literal("plugins").executes(commandContext -> {
@@ -80,26 +91,13 @@ public class CottonFramework implements ModInitializer  {
                     commandContext.getSource().sendFeedback(() -> Text.literal("Visit https://github.com/FurryPlayPlace/CottonFramework for more information"), false);
                     return 0;
                 }));
+
+                this.api.pluginManager().getCommands().forEach(command -> {
+                    dispatcher.register(literal(command.getName()).executes(commandContext -> command.execute(commandContext, commandContext.getSource().getPlayer())));
+                    this.logger.info("Registered command: {}", command.getName());
+                });
             }
         });
-    }
-
-    @Subscribe
-    public void onCottonInitialize(CottonPluginInitialize event) {
-        this.logger.info("Initializing all plugins...");
-
-        this.api.pluginManager().loadPlugins();
-
-        // Start - Registering all commands logic
-
-        CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> this.api.pluginManager().getCommands().forEach(command -> {
-            if (environment.dedicated) {
-                dispatcher.register(literal(command.getName()).executes(commandContext -> command.execute(commandContext, commandContext.getSource().getPlayer())));
-                this.logger.info("Registered command: {}", command.getName());
-            }
-        }));
-
-        // End - Registering all commands logic
 
         CottonAPI.get().pluginManager().enableAllPlugins();
 

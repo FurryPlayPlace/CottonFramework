@@ -28,7 +28,7 @@ import java.util.List;
  * The {@code PluginManager} interface defines methods for managing plugins in the Cotton API.
  * It provides capabilities to register, enable, disable, load, unload, and manage plugin states.
  */
-public interface IPluginManager {
+public interface IPluginManager extends ICommandManager {
 
     /**
      * Registers a plugin with the system.

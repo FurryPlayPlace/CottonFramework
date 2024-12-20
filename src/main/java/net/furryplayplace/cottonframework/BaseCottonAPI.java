@@ -15,6 +15,7 @@ Last Modified : 19.12.2024
 package net.furryplayplace.cottonframework;
 
 import net.furryplayplace.cottonframework.api.CottonAPI;
+import net.furryplayplace.cottonframework.api.plugin.interfaces.ICommandManager;
 import net.furryplayplace.cottonframework.manager.PluginManager;
 
 public class BaseCottonAPI extends CottonAPI {

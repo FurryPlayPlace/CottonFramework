@@ -21,7 +21,6 @@ import com.google.common.eventbus.*;
 import net.furryplayplace.cottonframework.api.command.AbstractCommand;
 import net.furryplayplace.cottonframework.api.exceptions.PluginAlreadyRegisteredExceptions;
 import net.furryplayplace.cottonframework.api.exceptions.PluginNotRegisteredExceptions;
-import net.furryplayplace.cottonframework.api.plugin.interfaces.ICommandManager;
 import net.furryplayplace.cottonframework.api.plugin.interfaces.IPluginManager;
 import net.furryplayplace.cottonframework.manager.plugin.CottonClassLoader;
 import org.apache.logging.log4j.LogManager;
@@ -37,10 +36,10 @@ import java.util.jar.Manifest;
 
 import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
 
-public class PluginManager implements IPluginManager, ICommandManager {
+public class PluginManager implements IPluginManager {
     private final Logger logger = LogManager.getLogger("PluginManager");
     private final HashMap<String, PluginContainer<CottonPlugin>> plugins = new HashMap<>();
-    private final HashMap<String, AbstractCommand> commands = new HashMap<>();
+    private final HashMap<CottonPlugin, AbstractCommand> commands = new HashMap<>();
 
     private final AsyncEventBus eventBus = new AsyncEventBus("CottonEventBus", directExecutor());
 
@@ -482,15 +481,15 @@ public class PluginManager implements IPluginManager, ICommandManager {
     }
 
     @Override
-    public void registerCommand(AbstractCommand command) {
-        this.commands.put(command.getName(), command);
-        this.logger.info("Registered command {}.", command.getName());
+    public void registerCommand(CottonPlugin plugin, AbstractCommand command) {
+        this.commands.put(plugin, command);
+        this.logger.info("Registered command {} plugin {}", command.getName(), plugin.name());
     }
 
     @Override
-    public void unregisterCommand(AbstractCommand command) {
-        this.commands.remove(command.getName());
-        this.logger.info("Unregistered command {}.", command.getName());
+    public void unregisterCommand(CottonPlugin plugin, AbstractCommand command) {
+        this.commands.remove(plugin, command);
+        this.logger.info("Unregistered command {} plugin {}", command.getName(), plugin.name());
     }
 
     @Override

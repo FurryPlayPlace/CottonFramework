@@ -15,9 +15,10 @@ Last Modified : 19.12.2024
 package net.furryplayplace.cottonframework.api.plugin.interfaces;
 
 import net.furryplayplace.cottonframework.api.command.AbstractCommand;
+import net.furryplayplace.cottonframework.api.plugin.CottonPlugin;
 
 public interface ICommandManager {
-    void registerCommand(AbstractCommand command);
-    void unregisterCommand(AbstractCommand command);
+    void registerCommand(CottonPlugin plugin, AbstractCommand command);
+    void unregisterCommand(CottonPlugin plugin, AbstractCommand command);
     void unregisterAllCommands();
 }
