@@ -39,7 +39,7 @@ public abstract class CottonPlugin  {
         this.version = version;
         this.authors = authors;
 
-        this.config = new ConfigurationManager(new File("plugins"), new File(name));
+        this.config = new ConfigurationManager(this, new File("plugins"), new File(name));
         this.logger = Logger.getLogger(name);
     }
 
@@ -47,6 +47,10 @@ public abstract class CottonPlugin  {
     public abstract void onDisable();
 
     public abstract void onLoad();
+
+    public void saveConfig() {
+        this.config.save();
+    }
 
     public String name() { return name; }
     public String version() { return version; }

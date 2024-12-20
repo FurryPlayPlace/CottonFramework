@@ -15,6 +15,7 @@ Last Modified : 19.12.2024
 package net.furryplayplace.cottonframework.manager.plugin;
 
 import net.furryplayplace.cottonframework.CottonFramework;
+import net.furryplayplace.cottonframework.manager.plugin.transformers.TransformerManager;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,6 +29,7 @@ import java.security.PrivilegedAction;
  * {@code CottonClassLoader} provides a secure container for loading plugins from JAR files.
  */
 public class CottonClassLoader extends URLClassLoader {
+    private final TransformerManager transformerManager = new TransformerManager();
 
     /**
      * Creates a new {@code CottonClassLoader} for loading plugin classes securely.
@@ -43,14 +45,11 @@ public class CottonClassLoader extends URLClassLoader {
     @Override
     protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
         synchronized (getClassLoadingLock(name)) {
-            // Check if the class is already loaded
             Class<?> loadedClass = findLoadedClass(name);
             if (loadedClass == null) {
                 try {
-                    // Try loading with parent ClassLoader first
                     loadedClass = getParent().loadClass(name);
                 } catch (ClassNotFoundException e) {
-                    // Parent couldn't load it, try finding the class locally
                     loadedClass = findClass(name);
                 }
             }
@@ -71,9 +70,10 @@ public class CottonClassLoader extends URLClassLoader {
             }
 
             byte[] classBytes = resource.openStream().readAllBytes();
+            byte[] transformed = transformerManager.transform(name, classBytes);
 
             // Define the class
-            return defineClass(name, classBytes, 0, classBytes.length);
+            return defineClass(name, transformed, 0, transformed.length);
         } catch (IOException e) {
             throw new ClassNotFoundException("Error reading class " + name, e);
         }

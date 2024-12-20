@@ -34,18 +34,15 @@ public class Cottontestplugin extends CottonPlugin  {
     }
 
     @Override
-    public void onDisable() {
-
-    }
+    public void onDisable() {}
 
     @Override
-    public void onLoad() {
-
-    }
+    public void onLoad() {}
 
     @Subscribe
     public void onBlockBreak(BlockBreakEvent event) {
        event.getPlayer().sendMessage(Text.of("You broke a block!"));
+       event.setCancelled(true);
     }
 
     @Subscribe
@@ -56,6 +53,7 @@ public class Cottontestplugin extends CottonPlugin  {
     @Subscribe
     public void onBlockPlace(BlockPlaceEvent event) {
         event.getPlayer().sendMessage(Text.of("You placed a block!"));
+        event.setCancelled(true);
     }
 
     @Subscribe

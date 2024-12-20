@@ -161,6 +161,7 @@ public class PluginManager implements IPluginManager {
             throw new PluginNotRegisteredExceptions(name + " is not registered.");
 
         currentPlugin.setState(PluginState.ENABLED);
+        currentPlugin.getPlugin().onLoad();
         currentPlugin.getPlugin().onEnable();
 
         this.logger.info("Enabled plugin {} ({}) by {}.", currentPlugin.getPlugin().name(), currentPlugin.getPlugin().version(), String.join(", ", currentPlugin.getPlugin().authors()));
@@ -283,11 +284,6 @@ public class PluginManager implements IPluginManager {
                 }
 
                 Class<?> pluginClass = pluginClassLoader.loadClass(mainClass);
-
-                System.out.println(pluginClass.getSuperclass().getPackageName());
-                System.out.println(pluginClass.getSuperclass().getCanonicalName());
-                System.out.println(pluginClass.getSuperclass().getName());
-
                 if (!CottonPlugin.class.isAssignableFrom(pluginClass)) {
                     throw new ClassCastException("Class " + mainClass + " does not implement CottonPlugin interface.");
                 }

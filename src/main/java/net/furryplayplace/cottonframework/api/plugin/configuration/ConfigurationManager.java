@@ -14,6 +14,8 @@ Last Modified : 20.12.2024
 
 package net.furryplayplace.cottonframework.api.plugin.configuration;
 
+import net.furryplayplace.cottonframework.api.plugin.CottonPlugin;
+import org.jetbrains.annotations.NotNull;
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
@@ -26,17 +28,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ConfigurationManager {
+    private final CottonPlugin plugin;
     private final File file;
     private Map<String, Object> data;
 
-    public ConfigurationManager(File pluginsDir, File configDir) {
+    public ConfigurationManager(CottonPlugin plugin, File pluginsDir, @NotNull File configDir) {
+        this.plugin = plugin;
+
         this.file = new File(pluginsDir, configDir.getPath() + File.separator + "config.yml");
-        if (file.exists()) {
-            load();
-        }
     }
 
-    private void load() {
+    public void load() {
         Yaml yaml = new Yaml(new Constructor(Map.class, new LoaderOptions()));
         try (FileInputStream inputStream = new FileInputStream(file)) {
             Object loadedData = yaml.load(inputStream);
@@ -46,14 +48,18 @@ public class ConfigurationManager {
                 data = new HashMap<>();
             }
         } catch (IOException e) {
-            throw new RuntimeException("Failed to load configuration", e);
+            this.plugin.getLogger().severe("Unable to load config.yml");
+            e.printStackTrace();
         }
     }
 
-    public void save() throws IOException {
+    public void save() {
         Yaml yaml = new Yaml();
         try (FileWriter writer = new FileWriter(file)) {
             yaml.dump(data, writer);
+        } catch (Exception e) {
+            this.plugin.getLogger().severe("Unable to save config.yml");
+            e.printStackTrace();
         }
     }
 
