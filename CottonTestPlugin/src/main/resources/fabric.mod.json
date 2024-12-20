@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "cottontestplugin",
+  "version": "${version}",
+
+  "name": "CottonTestPlugin",
+  "description": "",
+  "authors": [],
+  "contact": {},
+
+  "license": "All-Rights-Reserved",
+  "icon": "assets/cottontestplugin/icon.png",
+
+  "environment": "server",
+  "entrypoints": {
+    "main": ["net.furryplayplace.cottontestplugin.Cottontestplugin"]
+  },
+
+  "mixins": [
+    "cottontestplugin.mixins.json"
+    ,{
+      "config": "cottontestplugin.client.mixins.json",
+      "environment": "client"
+    }
+  ],
+
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}

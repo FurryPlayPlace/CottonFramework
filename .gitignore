@@ -4,3 +4,5 @@
 /run/
 /CottonAPI/.gradle/
 /CottonAPI/build/
+/CottonTestPlugin/build/
+/CottonTestPlugin/.gradle/

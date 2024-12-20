@@ -63,23 +63,21 @@ Here’s an example of registering a custom game event:
 
 ```java
 import net.furryplayplace.cottonframework.api.CottonAPI;
-import plugin.api.CottonPlugin;
-import net.fabricmc.api.ModInitializer;
+import net.furryplayplace.cottonframework.api.events.player.PlayerJoinEvent;
+import net.furryplayplace.cottonframework.api.plugin.CottonPlugin;
 
-public class MyPlugin implements CottonPlugin, ModInitializer {
+public class MyPlugin extends CottonPlugin {
     
     public MyPlugin() {
         super("name", "version", List.of("authors"));
     }
     
     @Override
-    public void onInitialize() {}
-    
-    @Override
     public void onEnable() {
         System.out.println("Hello World!");
         
         CottonAPI.get().pluginManager().getEventBus().register(this);
+        CottonAPI.get().pluginManager().registerCommand(this, new MyCommand());
     }
 
     @Override
