@@ -7,12 +7,14 @@ import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.furryplayplace.cottonframework.api.CottonAPI;
 import net.furryplayplace.cottonframework.api.events.server.ServerLoadEvent;
 import net.furryplayplace.cottonframework.api.events.cotton.CottonPluginShutdown;
+import net.furryplayplace.cottonframework.contributors.ContributorManager;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.List;
+import java.util.Optional;
 
 import static net.minecraft.server.command.CommandManager.literal;
 
@@ -20,8 +22,8 @@ public class CottonFramework implements ModInitializer  {
     private final Logger logger = LogManager.getLogger("CottonFramework");
 
     public static final String MOD_ID = "cottonframework";
-    public static final String MOD_NAME = "CottonFramework";
-    public static final String MOD_VERSION = "1.0.0";
+    public static final String MOD_NAME = "Cotton Framework";
+    public static final String MOD_VERSION = "${version}";
     public static final String MOD_AUTHOR = "Vakea";
 
     @Getter
@@ -49,6 +51,10 @@ public class CottonFramework implements ModInitializer  {
         this.logger.info(" - Name: {}", MOD_NAME);
         this.logger.info(" - Version: {}", MOD_VERSION);
         this.logger.info(" - Author: {}", MOD_AUTHOR);
+
+        ContributorManager
+                .getContributors()
+                .ifPresent(contributorList -> this.logger.info(" - Contributors: {}", String.join(", ", contributorList.stream().map(ContributorManager.Contributor::getLogin).toList())));
 
         this.logger.info("No support will be provided for this framework.");
         this.logger.info("If you want to contribute, please visit https://github.com/FurryPlayPlace/CottonFramework");
