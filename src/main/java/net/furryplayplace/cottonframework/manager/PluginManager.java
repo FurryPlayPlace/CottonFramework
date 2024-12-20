@@ -28,7 +28,6 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.Closeable;
 import java.io.File;
-import java.lang.reflect.Field;
 import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;

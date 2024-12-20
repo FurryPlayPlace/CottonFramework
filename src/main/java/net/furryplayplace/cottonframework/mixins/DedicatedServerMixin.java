@@ -16,6 +16,7 @@ package net.furryplayplace.cottonframework.mixins;
 
 import net.furryplayplace.cottonframework.api.events.cotton.CottonPluginInitialize;
 import net.furryplayplace.cottonframework.CottonFramework;
+import net.furryplayplace.cottonframework.api.events.server.ServerLoadEvent;
 import net.minecraft.server.dedicated.MinecraftDedicatedServer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -28,5 +29,9 @@ public class DedicatedServerMixin {
     private void initServer(CallbackInfoReturnable<Boolean> cir) {
         CottonFramework.getInstance().getApi().pluginManager()
                         .getEventBus().post(new CottonPluginInitialize());
+
+        ServerLoadEvent serverLoadEvent = new ServerLoadEvent(ServerLoadEvent.LoadType.STARTUP);
+        CottonFramework.getInstance().getApi().pluginManager()
+                        .getEventBus().post(serverLoadEvent);
     }
 }

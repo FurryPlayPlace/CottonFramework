@@ -10,10 +10,11 @@
     "PortalForceMixin",
     "block.BlockMixin",
     "entity.ExplosionWorldMixin",
-    "player.ServerPlayerEntityMixin",
     "network.ServerHandshakeNetworkHandlerMixin",
     "network.ServerLoginNetworkHandlerMixin",
-    "network.ServerPlayNetworkHandlerMixin"
+    "network.ServerPlayNetworkHandlerMixin",
+    "network.ServerQueryNetworkHandlerMixin",
+    "player.ServerPlayerEntityMixin"
   ],
   "mixins": [
 

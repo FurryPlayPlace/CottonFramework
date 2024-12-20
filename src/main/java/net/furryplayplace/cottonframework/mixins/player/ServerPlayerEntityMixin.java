@@ -164,11 +164,6 @@ public abstract class ServerPlayerEntityMixin {
                 .post(playerBedLeaveEvent);
     }
 
-    @Inject(method = "travel", at = @At(value = "HEAD"))
-    public void onMovement(Vec3d movementInput, CallbackInfo ci) {
-
-    }
-
     @Inject(method = "dropItem", at = @At(value = "HEAD"))
     public void onDropItem(ItemStack stack, boolean throwRandomly, boolean retainOwnership, CallbackInfoReturnable<ItemEntity> cir) {
         PlayerEntity player = (PlayerEntity) (Object) this;

@@ -5,8 +5,7 @@ import lombok.Getter;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.furryplayplace.cottonframework.api.CottonAPI;
-import net.furryplayplace.cottonframework.api.plugin.CottonPlugin;
-import net.furryplayplace.cottonframework.api.events.cotton.CottonPluginInitialize;
+import net.furryplayplace.cottonframework.api.events.server.ServerLoadEvent;
 import net.furryplayplace.cottonframework.api.events.cotton.CottonPluginShutdown;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -82,6 +81,20 @@ public class CottonFramework implements ModInitializer  {
                     commandContext.getSource().sendFeedback(() -> Text.literal("Developed by " + MOD_AUTHOR), false);
                     commandContext.getSource().sendFeedback(() -> Text.literal("Visit https://github.com/FurryPlayPlace/CottonFramework for more information"), false);
                     return 0;
+                }));
+
+                dispatcher.register(literal("reload").executes(commandContext -> {
+                    this.api.pluginManager().unloadPlugins();
+                    this.api.pluginManager().loadPlugins();
+                    CottonAPI.get().pluginManager().enableAllPlugins();
+
+                    ServerLoadEvent serverLoadEvent = new ServerLoadEvent(ServerLoadEvent.LoadType.RELOAD);
+                    CottonFramework.getInstance().getApi().pluginManager()
+                            .getEventBus().post(serverLoadEvent);
+
+                    commandContext.getSource().sendFeedback(() -> Text.literal(Formatting.GRAY + "Plugins have been reloaded."), true);
+
+                    return 1;
                 }));
 
                 this.api.pluginManager().getCommands().forEach(command -> {
