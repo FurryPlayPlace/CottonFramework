@@ -5,11 +5,15 @@
   "compatibilityLevel": "JAVA_21",
   "server": [
     "DedicatedServerMixin",
-    "MinecraftServerMixin",
     "LevelServerMixin",
-    "PortalForceMixin"
+    "MinecraftServerMixin",
+    "PortalForceMixin",
+    "block.BlockMixin"
   ],
-  "mixins": [],
+  "mixins": [
+    "player.ServerPlayerEntityMixin"
+  ],
+  "refmap": "cottonframework-refmap.json",
   "injectors": {
     "defaultRequire": 1
   },

@@ -14,13 +14,15 @@ Last Modified : 19.12.2024
 
 package net.furryplayplace.cottonframework.manager;
 
-import com.google.common.eventbus.EventBus;
-import net.furryplayplace.cotton.api.plugin.*;
-import net.furryplayplace.cotton.api.command.AbstractCommand;
-import net.furryplayplace.cotton.api.exceptions.PluginAlreadyRegisteredExceptions;
-import net.furryplayplace.cotton.api.exceptions.PluginNotRegisteredExceptions;
-import net.furryplayplace.cotton.api.plugin.interfaces.ICommandManager;
-import net.furryplayplace.cotton.api.plugin.interfaces.IPluginManager;
+import net.furryplayplace.cottonframework.api.plugin.CottonPlugin;
+import net.furryplayplace.cottonframework.api.plugin.PluginContainer;
+import net.furryplayplace.cottonframework.api.plugin.PluginState;
+import com.google.common.eventbus.*;
+import net.furryplayplace.cottonframework.api.command.AbstractCommand;
+import net.furryplayplace.cottonframework.api.exceptions.PluginAlreadyRegisteredExceptions;
+import net.furryplayplace.cottonframework.api.exceptions.PluginNotRegisteredExceptions;
+import net.furryplayplace.cottonframework.api.plugin.interfaces.ICommandManager;
+import net.furryplayplace.cottonframework.api.plugin.interfaces.IPluginManager;
 import net.furryplayplace.cottonframework.manager.plugin.CottonClassLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -33,12 +35,14 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
+import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
+
 public class PluginManager implements IPluginManager, ICommandManager {
     private final Logger logger = LogManager.getLogger("PluginManager");
     private final HashMap<String, PluginContainer<CottonPlugin>> plugins = new HashMap<>();
     private final HashMap<String, AbstractCommand> commands = new HashMap<>();
 
-    private final EventBus eventBus = new EventBus();
+    private final AsyncEventBus eventBus = new AsyncEventBus("CottonEventBus", directExecutor());
 
     private final File pluginsDir = new File("plugins");
 
@@ -47,6 +51,8 @@ public class PluginManager implements IPluginManager, ICommandManager {
             pluginsDir.mkdirs();
             this.logger.info("Created plugins directory.");
         }
+
+        this.logger.info("EventBus: {} with Dispatcher {}", this.eventBus.identifier(), (this.eventBus.getDispatcher() instanceof Dispatcher.ImmediateDispatcher ? "Immediate Mode" : "perThread mode") );
     }
 
     /**
@@ -271,6 +277,11 @@ public class PluginManager implements IPluginManager, ICommandManager {
                 }
 
                 Class<?> pluginClass = pluginClassLoader.loadClass(mainClass);
+
+                System.out.println(pluginClass.getSuperclass().getPackageName());
+                System.out.println(pluginClass.getSuperclass().getCanonicalName());
+                System.out.println(pluginClass.getSuperclass().getName());
+
                 if (!CottonPlugin.class.isAssignableFrom(pluginClass)) {
                     throw new ClassCastException("Class " + mainClass + " does not implement CottonPlugin interface.");
                 }

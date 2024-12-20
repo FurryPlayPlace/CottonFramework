@@ -62,8 +62,8 @@ To start using CottonFramework in your mods:
 Here’s an example of registering a custom game event:
 
 ```java
-import net.furryplayplace.cotton.api.CottonAPI;
-import net.furryplayplace.cotton.api.plugin.CottonPlugin;
+import net.furryplayplace.cottonframework.api.CottonAPI;
+import plugin.api.CottonPlugin;
 import net.fabricmc.api.ModInitializer;
 
 public class MyPlugin implements CottonPlugin, ModInitializer {

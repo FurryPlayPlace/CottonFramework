@@ -14,7 +14,7 @@ Last Modified : 19.12.2024
 
 package net.furryplayplace.cottonframework.mixins;
 
-import net.furryplayplace.cotton.api.events.world.PortalCreateEvent;
+import net.furryplayplace.cottonframework.api.events.world.PortalCreateEvent;
 import net.furryplayplace.cottonframework.CottonFramework;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.NetherPortalBlock;
@@ -45,7 +45,7 @@ public class PortalForceMixin {
 
         ThreadLocal.withInitial(() -> portalCreateEvent);
 
-        CottonFramework.getInstance().getPluginManager()
+        CottonFramework.getInstance().getApi().pluginManager()
                         .getEventBus().post(portalCreateEvent);
 
         cir.setReturnValue(Optional.of(new BlockLocating.Rectangle(pos.toImmutable(), 2, 3)));

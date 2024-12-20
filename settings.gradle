@@ -7,5 +7,5 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
-include 'CottonAPI'
+include 'CottonTestPlugin'
 

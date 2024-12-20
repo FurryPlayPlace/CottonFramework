@@ -4,10 +4,10 @@ import com.google.common.eventbus.Subscribe;
 import lombok.Getter;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
-import net.furryplayplace.cotton.api.CottonAPI;
-import net.furryplayplace.cotton.api.plugin.CottonPlugin;
-import net.furryplayplace.cotton.api.events.cotton.CottonPluginInitialize;
-import net.furryplayplace.cotton.api.events.cotton.CottonPluginShutdown;
+import net.furryplayplace.cottonframework.api.CottonAPI;
+import net.furryplayplace.cottonframework.api.plugin.CottonPlugin;
+import net.furryplayplace.cottonframework.api.events.cotton.CottonPluginInitialize;
+import net.furryplayplace.cottonframework.api.events.cotton.CottonPluginShutdown;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import org.apache.logging.log4j.LogManager;
@@ -29,7 +29,7 @@ public class CottonFramework implements ModInitializer  {
     private static CottonFramework instance;
 
     @Getter
-    public final CottonAPI api = new net.furryplayplace.cottonframework.CottonAPI();
+    public final CottonAPI api = new BaseCottonAPI();
 
     @Override
     public void onInitialize() {
@@ -101,7 +101,7 @@ public class CottonFramework implements ModInitializer  {
 
         // End - Registering all commands logic
 
-        this.api.pluginManager().enableAllPlugins();
+        CottonAPI.get().pluginManager().enableAllPlugins();
 
         this.logger.info("All plugins have been initialized.");
         this.logger.info("CottonFramework is ready to use.");
