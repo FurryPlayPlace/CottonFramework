@@ -48,6 +48,8 @@ public class PortalForceMixin {
         CottonFramework.getInstance().getApi().pluginManager()
                         .getEventBus().post(portalCreateEvent);
 
+        if (portalCreateEvent.isCancelled()) cir.cancel();
+
         cir.setReturnValue(Optional.of(new BlockLocating.Rectangle(pos.toImmutable(), 2, 3)));
     }
 }

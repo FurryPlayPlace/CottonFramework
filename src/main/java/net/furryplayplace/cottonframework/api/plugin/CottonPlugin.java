@@ -14,16 +14,24 @@ Last Modified : 19.12.2024
 
 package net.furryplayplace.cottonframework.api.plugin;
 
+import lombok.Getter;
+import net.furryplayplace.cottonframework.api.plugin.configuration.ConfigurationManager;
+
+import java.io.File;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
 
-public abstract class CottonPlugin {
+public abstract class CottonPlugin  {
 
     private final String name;
     private final String version;
     private final List<String> authors;
 
+    @Getter
+    private final ConfigurationManager config;
+
+    @Getter
     private final Logger logger;
 
     public CottonPlugin(String name, String version, List<String> authors) {
@@ -31,11 +39,14 @@ public abstract class CottonPlugin {
         this.version = version;
         this.authors = authors;
 
+        this.config = new ConfigurationManager(new File("plugins"), new File(name));
         this.logger = Logger.getLogger(name);
     }
 
     public abstract void onEnable();
     public abstract void onDisable();
+
+    public abstract void onLoad();
 
     public String name() { return name; }
     public String version() { return version; }

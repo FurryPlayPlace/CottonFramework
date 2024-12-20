@@ -59,32 +59,35 @@ public abstract class ServerPlayerEntityMixin {
         Location to = new Location(teleportTarget.world(), teleportTarget.pos().x, teleportTarget.pos().y, teleportTarget.pos().z, teleportTarget.yaw(), teleportTarget.pitch());
 
         PlayerPortalEvent playerPortalEvent = new PlayerPortalEvent(player, from, to);
-        if (playerPortalEvent.isCancelled())
-            return;
 
         CottonAPI.get().pluginManager().getEventBus()
                 .post(playerPortalEvent);
+
+
+        if (playerPortalEvent.isCancelled()) cir.cancel();
     }
 
 
-    @Inject(method = "teleport(Lnet/minecraft/server/world/ServerWorld;DDDFF)V", at = @At(value = "HEAD"))
+    @Inject(method = "teleport(Lnet/minecraft/server/world/ServerWorld;DDDFF)V", at = @At(value = "HEAD"), cancellable = true)
     public void onTeleport(ServerWorld targetWorld, double x, double y, double z, float yaw, float pitch, CallbackInfo ci) {
         PlayerEntity player = (PlayerEntity) (Object) this;
         if (player == null) return;
 
-        if (ci.isCancelled())
-            return;
+        Location from = new Location(player.getWorld(), player.getX(), player.getY(), player.getZ(), player.getYaw(), player.getPitch());
+        Location to = new Location(targetWorld, x, y, z, yaw, pitch);
 
-        getPlayerCurrentLoc(targetWorld, player, x, y, z, yaw, pitch);
+        PlayerTeleportEvent playerTeleportEvent = new PlayerTeleportEvent(player, from, to);
+
+        CottonAPI.get().pluginManager().getEventBus()
+                .post(playerTeleportEvent);
+
+        if (playerTeleportEvent.isCancelled()) ci.cancel();
     }
 
     @Inject(method = "teleport(Lnet/minecraft/server/world/ServerWorld;DDDLjava/util/Set;FF)Z", at = @At(value = "HEAD"))
     public void onTeleport(ServerWorld world, double destX, double destY, double destZ, Set<PositionFlag> flags, float yaw, float pitch, CallbackInfoReturnable<Boolean> cir) {
         PlayerEntity player = (PlayerEntity) (Object) this;
         if (player == null) return;
-
-        if (cir.isCancelled())
-            return;
 
         Set<PositionFlag> modifiableFlags = EnumSet.copyOf(flags);
 
@@ -94,24 +97,19 @@ public abstract class ServerPlayerEntityMixin {
         float adjustedYaw = modifiableFlags.contains(PositionFlag.Y_ROT) ? yaw : player.getYaw();
         float adjustedPitch = modifiableFlags.contains(PositionFlag.X_ROT) ? pitch : player.getPitch();
 
-        getPlayerCurrentLoc(world, player, x, y, z, adjustedYaw, adjustedPitch);
-    }
-
-    @Unique
-    private void getPlayerCurrentLoc(ServerWorld world, PlayerEntity player, double x, double y, double z, float adjustedYaw, float adjustedPitch) {
         Location from = new Location(player.getWorld(), player.getX(), player.getY(), player.getZ(), player.getYaw(), player.getPitch());
         Location to = new Location(world, x, y, z, adjustedYaw, adjustedPitch);
 
         PlayerTeleportEvent playerTeleportEvent = new PlayerTeleportEvent(player, from, to);
-        if (playerTeleportEvent.isCancelled())
-            return;
 
         CottonAPI.get().pluginManager().getEventBus()
                 .post(playerTeleportEvent);
+
+        if (playerTeleportEvent.isCancelled()) cir.cancel();
     }
 
 
-    @Inject(method = "attack", at = @At(value = "RETURN"))
+    @Inject(method = "attack", at = @At(value = "RETURN"), cancellable = true)
     public void onAttack(Entity target, CallbackInfo ci) {
         PlayerEntity player = (PlayerEntity) (Object) this;
         if (player == null) return;
@@ -119,15 +117,14 @@ public abstract class ServerPlayerEntityMixin {
         PlayerInteractEntityEvent playerInteractEntityEvent = new PlayerInteractEntityEvent(player, target);
         playerInteractEntityEvent.setCancelled(ci.isCancelled());
 
-        if (playerInteractEntityEvent.isCancelled())
-            return;
-
         CottonAPI.get().pluginManager().getEventBus()
                 .post(playerInteractEntityEvent);
+
+        if (playerInteractEntityEvent.isCancelled()) ci.cancel();
     }
 
 
-    @Inject(method = "sleep", at = @At(value = "HEAD"))
+    @Inject(method = "sleep", at = @At(value = "HEAD"), cancellable = true)
     public void onSleep(BlockPos pos, CallbackInfo ci) {
         PlayerEntity player = (PlayerEntity) (Object) this;
         if (player == null) return;
@@ -148,20 +145,22 @@ public abstract class ServerPlayerEntityMixin {
 
             CottonAPI.get().pluginManager().getEventBus()
                     .post(playerBedEnterEvent);
+
+            if (playerBedEnterEvent.isCancelled()) ci.cancel();
         }
     }
 
-    @Inject(method = "wakeUp", at = @At("RETURN"))
+    @Inject(method = "wakeUp", at = @At("RETURN"), cancellable = true)
     public void onWakeUp(boolean skipSleepTimer, boolean updateSleepingPlayers, CallbackInfo ci) {
         PlayerEntity player = (PlayerEntity) (Object) this;
         if (player == null) return;
 
         PlayerBedLeaveEvent playerBedLeaveEvent = new PlayerBedLeaveEvent(player, true);
-        if (playerBedLeaveEvent.isCancelled())
-            return;
 
         CottonAPI.get().pluginManager().getEventBus()
                 .post(playerBedLeaveEvent);
+
+        if (playerBedLeaveEvent.isCancelled()) ci.cancel();
     }
 
     @Inject(method = "dropItem", at = @At(value = "HEAD"))
@@ -171,11 +170,10 @@ public abstract class ServerPlayerEntityMixin {
 
         PlayerDropItemEvent playerDropItemEvent = new PlayerDropItemEvent(player, stack.getItem());
 
-        if (playerDropItemEvent.isCancelled())
-            return;
-
         CottonAPI.get().pluginManager().getEventBus()
                 .post(playerDropItemEvent);
+
+        if (playerDropItemEvent.isCancelled()) cir.cancel();
     }
 
     @Inject(method = "onDisconnect", at = @At(value = "HEAD"))

@@ -37,73 +37,61 @@ public class ExplosionWorldMixin {
     @Inject(method = "createExplosion(Lnet/minecraft/entity/Entity;DDDFLnet/minecraft/world/World$ExplosionSourceType;)Lnet/minecraft/world/explosion/Explosion;", at = @At("RETURN"))
     public void createExplosion(Entity entity, double x, double y, double z, float power, World.ExplosionSourceType explosionSourceType, CallbackInfoReturnable<Explosion> cir) {
         EntityExplodeEvent entityExplodeEvent = new EntityExplodeEvent(entity, new Location(entity.getWorld(), x, y, z), cir.getReturnValue().getAffectedBlocks(), power);
-        entityExplodeEvent.setCancelled(cir.isCancelled());
-
-        if (entityExplodeEvent.isCancelled())
-            return;
 
         CottonFramework.getInstance().getApi()
                 .pluginManager().getEventBus().post(entityExplodeEvent);
+
+        if (entityExplodeEvent.isCancelled()) cir.cancel();
     }
 
     @Inject(method = "createExplosion(Lnet/minecraft/entity/Entity;Lnet/minecraft/entity/damage/DamageSource;Lnet/minecraft/world/explosion/ExplosionBehavior;DDDFZLnet/minecraft/world/World$ExplosionSourceType;)Lnet/minecraft/world/explosion/Explosion;", at = @At("RETURN"))
     public void createExplosion(Entity entity, DamageSource damageSource, ExplosionBehavior behavior, double x, double y, double z, float power, boolean createFire, World.ExplosionSourceType explosionSourceType, CallbackInfoReturnable<Explosion> cir) {
         EntityExplodeEvent entityExplodeEvent = new EntityExplodeEvent(entity, new Location(entity.getWorld(), x, y, z), cir.getReturnValue().getAffectedBlocks(), power);
-        entityExplodeEvent.setCancelled(cir.isCancelled());
-
-        if (entityExplodeEvent.isCancelled())
-            return;
 
         CottonFramework.getInstance().getApi()
                 .pluginManager().getEventBus().post(entityExplodeEvent);
+
+        if (entityExplodeEvent.isCancelled()) cir.cancel();
     }
 
     @Inject(method = "createExplosion(Lnet/minecraft/entity/Entity;Lnet/minecraft/entity/damage/DamageSource;Lnet/minecraft/world/explosion/ExplosionBehavior;DDDFZLnet/minecraft/world/World$ExplosionSourceType;Lnet/minecraft/particle/ParticleEffect;Lnet/minecraft/particle/ParticleEffect;Lnet/minecraft/registry/entry/RegistryEntry;)Lnet/minecraft/world/explosion/Explosion;", at = @At("RETURN"))
     public void createExplosion(Entity entity, DamageSource damageSource, ExplosionBehavior behavior, double x, double y, double z, float power, boolean createFire, World.ExplosionSourceType explosionSourceType, ParticleEffect particle, ParticleEffect emitterParticle, RegistryEntry<SoundEvent> soundEvent, CallbackInfoReturnable<Explosion> cir) {
         EntityExplodeEvent entityExplodeEvent = new EntityExplodeEvent(entity, new Location(entity.getWorld(), x, y, z), cir.getReturnValue().getAffectedBlocks(), power);
-        entityExplodeEvent.setCancelled(cir.isCancelled());
-
-        if (entityExplodeEvent.isCancelled())
-            return;
 
         CottonFramework.getInstance().getApi()
                 .pluginManager().getEventBus().post(entityExplodeEvent);
+
+        if (entityExplodeEvent.isCancelled()) cir.cancel();
     }
 
     @Inject(method = "createExplosion(Lnet/minecraft/entity/Entity;DDDFZLnet/minecraft/world/World$ExplosionSourceType;)Lnet/minecraft/world/explosion/Explosion;", at = @At("RETURN"))
     public void createExplosion(Entity entity, double x, double y, double z, float power, boolean createFire, World.ExplosionSourceType explosionSourceType, CallbackInfoReturnable<Explosion> cir) {
         EntityExplodeEvent entityExplodeEvent = new EntityExplodeEvent(entity, new Location(entity.getWorld(), x, y, z), cir.getReturnValue().getAffectedBlocks(), power);
-        entityExplodeEvent.setCancelled(cir.isCancelled());
-
-        if (entityExplodeEvent.isCancelled())
-            return;
 
         CottonFramework.getInstance().getApi()
                 .pluginManager().getEventBus().post(entityExplodeEvent);
+
+        if (entityExplodeEvent.isCancelled()) cir.cancel();
     }
 
     @Inject(method = "createExplosion(Lnet/minecraft/entity/Entity;Lnet/minecraft/entity/damage/DamageSource;Lnet/minecraft/world/explosion/ExplosionBehavior;DDDFZLnet/minecraft/world/World$ExplosionSourceType;ZLnet/minecraft/particle/ParticleEffect;Lnet/minecraft/particle/ParticleEffect;Lnet/minecraft/registry/entry/RegistryEntry;)Lnet/minecraft/world/explosion/Explosion;", at = @At("RETURN"))
     public void createExplosion(Entity entity, DamageSource damageSource, ExplosionBehavior behavior, double x, double y, double z, float power, boolean createFire, World.ExplosionSourceType explosionSourceType, boolean particles, ParticleEffect particle, ParticleEffect emitterParticle, RegistryEntry<SoundEvent> soundEvent, CallbackInfoReturnable<Explosion> cir) {
         EntityExplodeEvent entityExplodeEvent = new EntityExplodeEvent(entity, new Location(entity.getWorld(), x, y, z), cir.getReturnValue().getAffectedBlocks(), power);
-        entityExplodeEvent.setCancelled(cir.isCancelled());
-
-        if (entityExplodeEvent.isCancelled())
-            return;
 
         CottonFramework.getInstance().getApi()
                 .pluginManager().getEventBus().post(entityExplodeEvent);
+
+        if (entityExplodeEvent.isCancelled()) cir.cancel();
     }
 
     @Inject(method = "createExplosion(Lnet/minecraft/entity/Entity;Lnet/minecraft/entity/damage/DamageSource;Lnet/minecraft/world/explosion/ExplosionBehavior;Lnet/minecraft/util/math/Vec3d;FZLnet/minecraft/world/World$ExplosionSourceType;)Lnet/minecraft/world/explosion/Explosion;", at = @At("RETURN"))
     public void createExplosion(Entity entity, DamageSource damageSource, ExplosionBehavior behavior, Vec3d pos, float power, boolean createFire, World.ExplosionSourceType explosionSourceType, CallbackInfoReturnable<Explosion> cir) {
         EntityExplodeEvent entityExplodeEvent = new EntityExplodeEvent(entity, new Location(entity.getWorld(), pos.x, pos.y, pos.z), cir.getReturnValue().getAffectedBlocks(), power);
-        entityExplodeEvent.setCancelled(cir.isCancelled());
-
-        if (entityExplodeEvent.isCancelled())
-            return;
 
         CottonFramework.getInstance().getApi()
                 .pluginManager().getEventBus().post(entityExplodeEvent);
+
+        if (entityExplodeEvent.isCancelled()) cir.cancel();
     }
 
 }

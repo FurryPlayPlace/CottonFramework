@@ -16,6 +16,7 @@ package net.furryplayplace.cottontestplugin.commands;
 
 import com.mojang.brigadier.context.CommandContext;
 import net.furryplayplace.cottonframework.api.command.AbstractCommand;
+import net.furryplayplace.cottontestplugin.Cottontestplugin;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
@@ -29,6 +30,7 @@ public class TestCommand extends AbstractCommand {
     public int execute(CommandContext<ServerCommandSource> context, ServerPlayerEntity sender) {
 
         context.getSource().sendFeedback(() -> Text.of("Test command executed!"), false);
+        context.getSource().sendFeedback(() -> Text.of( "Test config: " + Cottontestplugin.getInstance().getConfig().getString("test.login", "vakea")), false);
 
         return 1;
     }

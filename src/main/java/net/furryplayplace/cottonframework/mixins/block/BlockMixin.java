@@ -42,14 +42,13 @@ public abstract class BlockMixin {
         BlockBreakEvent blockBreakEvent = new BlockBreakEvent(state.getBlock(), player);
         blockBreakEvent.setCancelled(cir.isCancelled());
 
-        if (blockBreakEvent.isCancelled())
-            return;
-
         CottonFramework.getInstance().getApi()
                 .pluginManager().getEventBus().post(blockBreakEvent);
+
+        if (blockBreakEvent.isCancelled()) cir.cancel();
     }
 
-    @Inject(method = "onPlaced", at = @At("RETURN"))
+    @Inject(method = "onPlaced", at = @At("RETURN"), cancellable = true)
     public void onPlaced(World world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack itemStack, CallbackInfo ci) {
 
         Block placed = state.getBlock();
@@ -58,24 +57,22 @@ public abstract class BlockMixin {
         BlockPlaceEvent blockBreakEvent = new BlockPlaceEvent(placed, state, placedAgainst, itemStack, (PlayerEntity) placer, true, placer.getPreferredEquipmentSlot(itemStack));
         blockBreakEvent.setCancelled(ci.isCancelled());
 
-        if (blockBreakEvent.isCancelled())
-            return;
-
         CottonFramework.getInstance().getApi()
                 .pluginManager().getEventBus().post(blockBreakEvent);
+
+        if (blockBreakEvent.isCancelled()) ci.cancel();
     }
 
-    @Inject(method = "onDestroyedByExplosion", at = @At("RETURN"))
+    @Inject(method = "onDestroyedByExplosion", at = @At("RETURN"), cancellable = true)
     public void onExplode(World world, BlockPos pos, Explosion explosion, CallbackInfo ci) {
         Block block = world.getBlockState(pos).getBlock();
 
         BlockExplodeEvent blockExplodeEvent = new BlockExplodeEvent(block, block.getDefaultState(), explosion.getAffectedBlocks(), explosion.getPower());
         blockExplodeEvent.setCancelled(ci.isCancelled());
 
-        if (blockExplodeEvent.isCancelled())
-            return;
-
         CottonFramework.getInstance().getApi()
                 .pluginManager().getEventBus().post(blockExplodeEvent);
+
+        if (blockExplodeEvent.isCancelled()) ci.cancel();
     }
 }

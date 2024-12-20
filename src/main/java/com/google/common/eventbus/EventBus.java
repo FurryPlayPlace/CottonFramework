@@ -19,6 +19,7 @@ import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
 
 import com.google.common.base.MoreObjects;
 import lombok.Getter;
+import net.furryplayplace.cottonframework.api.events.Cancellable;
 
 import java.lang.reflect.Method;
 import java.util.Iterator;
@@ -263,10 +264,17 @@ public class EventBus {
     public void post(Object event) {
         Iterator<Subscriber> eventSubscribers = subscribers.getSubscribers(event);
         if (eventSubscribers.hasNext()) {
-            dispatcher.dispatch(event, eventSubscribers);
-        } else if (!(event instanceof DeadEvent)) {
-            // the event had no subscribers and was not itself a DeadEvent
-            post(new DeadEvent(this, event));
+
+            // Adding compatibility of cancellable events
+            // Author: Vakea
+
+            if (event instanceof Cancellable cancellable) {
+                if (cancellable.isCancelled()) return;
+
+                dispatcher.dispatch(event, eventSubscribers);
+            } else {
+                dispatcher.dispatch(event, eventSubscribers);
+            }
         }
     }
 

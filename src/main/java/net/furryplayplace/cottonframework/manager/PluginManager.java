@@ -64,6 +64,14 @@ public class PluginManager implements IPluginManager {
         if (currentPlugin != null)
             throw new PluginAlreadyRegisteredExceptions(plugin.name() + " is already registered and cannot be registered again.");
 
+        File pluginFile = new File(this.pluginsDir, plugin.name());
+        if (!pluginFile.exists()) {
+            pluginFile.mkdirs();
+            this.logger.info("Created plugin directory for {}.", plugin.name());
+        }
+
+
+
         this.plugins.put(plugin.name(), new PluginContainer<>(plugin, PluginState.LOADED));
         this.logger.info("Registered plugin {} ({}) by {}.", plugin.name(), plugin.version(), String.join(", ", plugin.authors()));
     }

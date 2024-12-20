@@ -17,7 +17,7 @@
     "player.ServerPlayerEntityMixin"
   ],
   "mixins": [
-
+    "player.PlayerManagerMixin"
   ],
   "refmap": "cottonframework-refmap.json",
   "injectors": {

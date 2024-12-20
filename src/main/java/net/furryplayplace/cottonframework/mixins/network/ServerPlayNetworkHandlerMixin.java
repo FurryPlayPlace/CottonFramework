@@ -48,7 +48,7 @@ public abstract class ServerPlayNetworkHandlerMixin {
 
     @Shadow protected abstract Optional<LastSeenMessageList> validateAcknowledgment(LastSeenMessageList.Acknowledgment acknowledgment);
 
-    @Inject(method = "onVehicleMove", at = @At("RETURN"))
+    @Inject(method = "onVehicleMove", at = @At("RETURN"), cancellable = true)
     public void onVehicleMove(VehicleMoveC2SPacket packet, CallbackInfo ci) {
         PlayerEntity player = getPlayer();
         if (player == null) return;
@@ -57,14 +57,14 @@ public abstract class ServerPlayNetworkHandlerMixin {
         Location to = new Location(player.getWorld(), packet.getX(), packet.getY(), packet.getZ(), packet.getYaw(), packet.getPitch());
 
         PlayerVehicleMoveEvent playerVehicleMoveEvent = new PlayerVehicleMoveEvent(player, from, to);
-        if (playerVehicleMoveEvent.isCancelled())
-            return;
 
         CottonAPI.get().pluginManager().getEventBus()
                 .post(playerVehicleMoveEvent);
+
+        if (playerVehicleMoveEvent.isCancelled()) ci.cancel();
     }
 
-    @Inject(method = "onPlayerMove", at = @At(value = "RETURN"))
+    @Inject(method = "onPlayerMove", at = @At(value = "RETURN"), cancellable = true)
     public void onPlayerMove(PlayerMoveC2SPacket packet, CallbackInfo ci) {
         PlayerEntity player = getPlayer();
         if (player == null) return;
@@ -74,11 +74,10 @@ public abstract class ServerPlayNetworkHandlerMixin {
 
         PlayerMoveEvent playerMoveEvent = new PlayerMoveEvent(player, from, to);
 
-        if (playerMoveEvent.isCancelled())
-            return;
-
         CottonAPI.get().pluginManager().getEventBus()
                 .post(playerMoveEvent);
+
+        if (playerMoveEvent.isCancelled()) ci.cancel();
     }
 
     /**
@@ -111,18 +110,18 @@ public abstract class ServerPlayNetworkHandlerMixin {
             slice = @Slice(
                     from = @At(value = "HEAD", target = "Lnet/minecraft/screen/ScreenHandler;canUse(Lnet/minecraft/entity/player/PlayerEntity;)Z"),
                     to = @At(value = "TAIL", target = "Lnet/minecraft/screen/BeaconScreenHandler;setEffects(Ljava/util/Optional;Ljava/util/Optional;)V")
-            )
-    )
+            ),
+            cancellable = true)
     public void onUpdateBeacon(UpdateBeaconC2SPacket packet, CallbackInfo ci) {
         PlayerEntity player = getPlayer();
         if (player == null) return;
 
         PlayerSetBeaconEffectEvent playerSetBeaconEffectEvent = new PlayerSetBeaconEffectEvent(player, packet.primary(), packet.secondary());
-        if (playerSetBeaconEffectEvent.isCancelled())
-            return;
 
         CottonAPI.get().pluginManager().getEventBus()
                 .post(playerSetBeaconEffectEvent);
+
+        if (playerSetBeaconEffectEvent.isCancelled()) ci.cancel();
     }
 
     @Inject(method = "onDisconnected", at = @At("RETURN"))
@@ -142,7 +141,7 @@ public abstract class ServerPlayNetworkHandlerMixin {
         }
     }
 
-    @Inject(method = "onChatMessage", at = @At("RETURN"))
+    @Inject(method = "onChatMessage", at = @At("HEAD"), cancellable = true)
     public void onChatMessage(ChatMessageC2SPacket packet, CallbackInfo ci) throws MessageChain.MessageChainException {
         PlayerEntity player = getPlayer();
         if (player == null) return;
@@ -154,22 +153,31 @@ public abstract class ServerPlayNetworkHandlerMixin {
             Text textMessage = this.player.server.getMessageDecorator().decorate(this.player, signedMessage.getContent());
 
             PlayerChatMessageEvent playerChatMessageEvent = new PlayerChatMessageEvent(player, signedMessage, textMessage);
-            if (playerChatMessageEvent.isCancelled()) return;
 
             CottonAPI.get().pluginManager().getEventBus()
                     .post(playerChatMessageEvent);
+
+            if (playerChatMessageEvent.isCancelled()) {
+                ci.cancel();
+                return;
+            }
+
+            player.sendMessage(playerChatMessageEvent.getTextMessage());
         }
     }
 
-    @Inject(method = "onCraftRequest", at = @At("RETURN"))
+    @Inject(method = "onCraftRequest", at = @At("RETURN"), cancellable = true)
     public void onCraftRequest(CraftRequestC2SPacket packet, CallbackInfo ci) {
         PlayerEntity player = getPlayer();
         if (player == null) return;
 
         PlayerCraftRequestEvent playerCraftRequestEvent = new PlayerCraftRequestEvent(player, packet.getRecipeId(), packet.shouldCraftAll());
-        if (playerCraftRequestEvent.isCancelled()) return;
 
         CottonAPI.get().pluginManager().getEventBus()
                 .post(playerCraftRequestEvent);
+
+        if (playerCraftRequestEvent.isCancelled()){
+            ci.cancel();
+        }
     }
 }
