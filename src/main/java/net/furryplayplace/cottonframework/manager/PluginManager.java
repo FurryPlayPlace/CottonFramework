@@ -400,18 +400,6 @@ public class PluginManager implements IPluginManager {
             ClassLoader pluginClassLoader = pluginContainer.getPlugin().getClass().getClassLoader();
 
             if (pluginClassLoader instanceof CottonClassLoader) {
-                Field classesField = ClassLoader.class.getDeclaredField("classes");
-                classesField.setAccessible(true);
-
-                // Clear loaded classes
-                @SuppressWarnings("unchecked")
-                Vector<Class<?>> loadedClasses = (Vector<Class<?>>) classesField.get(pluginClassLoader);
-                for (Class<?> clazz : loadedClasses) {
-                    if (clazz.getClassLoader() == pluginClassLoader) {
-                        unloadClass(clazz);
-                    }
-                }
-
                 ((Closeable) pluginClassLoader).close();
 
                 this.logger.info("Cleared bytecodes for plugin {}.", pluginContainer.getPlugin().name());

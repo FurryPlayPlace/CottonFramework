@@ -56,20 +56,12 @@ public class CottonFramework implements ModInitializer  {
         this.logger.info("If you want to report a bug, please visit https://github.com/FurryPlayPlace/CottonFramework/issues");
         this.logger.info("If you want to request a new feature, please visit https://github.com/FurryPlayPlace/CottonFramework/issues");
 
-        this.logger.info("Awaiting for Cotton INIT Trigger...");
-
         this.api.pluginManager().getEventBus().register(this);
 
-
-    }
-
-    @Subscribe
-    public void onCottonInitialize(CottonPluginInitialize event) {
         this.logger.info("Initializing all plugins...");
 
         this.api.pluginManager().loadPlugins();
-
-        // Start - Registering all commands logic
+        CottonAPI.get().pluginManager().enableAllPlugins();
 
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
             if (environment.dedicated) {
@@ -99,15 +91,8 @@ public class CottonFramework implements ModInitializer  {
             }
         });
 
-        CottonAPI.get().pluginManager().enableAllPlugins();
-
         this.logger.info("All plugins have been initialized.");
         this.logger.info("CottonFramework is ready to use.");
-
-        List<String> pluginNames = this.api.pluginManager().getPlugins().stream()
-                .map(CottonPlugin::name).toList();
-
-        this.logger.info("Loaded plugins: {}", String.join(", ", pluginNames));
     }
 
     @Subscribe
