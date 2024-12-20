@@ -9,19 +9,12 @@ import org.jetbrains.annotations.NotNull;
  * This event is fired when the player is leaving a bed.
  */
 public class PlayerBedLeaveEvent extends PlayerEvent implements Cancellable {
-    private final Block bed;
     private boolean setBedSpawn;
     private boolean cancelled;
 
-    public PlayerBedLeaveEvent(@NotNull final PlayerEntity who, @NotNull final Block bed, boolean setBedSpawn) {
+    public PlayerBedLeaveEvent(@NotNull final PlayerEntity who, boolean setBedSpawn) {
         super(who);
-        this.bed = bed;
         this.setBedSpawn = setBedSpawn;
-    }
-
-    @NotNull
-    public Block getBed() {
-        return bed;
     }
 
     @Deprecated(forRemoval = true) // Paper - Unused

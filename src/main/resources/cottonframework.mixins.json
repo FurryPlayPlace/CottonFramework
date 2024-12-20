@@ -8,10 +8,15 @@
     "LevelServerMixin",
     "MinecraftServerMixin",
     "PortalForceMixin",
-    "block.BlockMixin"
+    "block.BlockMixin",
+    "entity.ExplosionWorldMixin",
+    "player.ServerPlayerEntityMixin",
+    "network.ServerHandshakeNetworkHandlerMixin",
+    "network.ServerLoginNetworkHandlerMixin",
+    "network.ServerPlayNetworkHandlerMixin"
   ],
   "mixins": [
-    "player.ServerPlayerEntityMixin"
+
   ],
   "refmap": "cottonframework-refmap.json",
   "injectors": {

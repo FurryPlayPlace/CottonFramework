@@ -1,38 +1,23 @@
 package net.furryplayplace.cottonframework.api.events.player;
 
+import net.furryplayplace.cottonframework.api.events.Event;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.network.ClientConnection;
 import org.jetbrains.annotations.NotNull;
 
 import java.net.InetAddress;
 
-public class PlayerLoginEvent extends PlayerEvent {
-    private final InetAddress address;
-    private final InetAddress realAddress;
+public class PlayerLoginEvent extends Event {
+    private final ClientConnection connection;
     private final String hostname;
 
-    public PlayerLoginEvent(@NotNull final PlayerEntity player, @NotNull final String hostname, @NotNull final InetAddress address, final @NotNull InetAddress realAddress) {
-        super(player);
+    public PlayerLoginEvent(@NotNull final ClientConnection connection, @NotNull final String hostname) {
+        this.connection = connection;
         this.hostname = hostname;
-        this.address = address;
-        this.realAddress = realAddress;
-    }
-
-    public PlayerLoginEvent(@NotNull final PlayerEntity player, @NotNull final String hostname, @NotNull final InetAddress address) {
-        this(player, hostname, address, address);
     }
 
     @NotNull
     public String getHostname() {
         return hostname;
-    }
-
-    @NotNull
-    public InetAddress getAddress() {
-        return address;
-    }
-
-    @NotNull
-    public InetAddress getRealAddress() {
-        return realAddress;
     }
 }

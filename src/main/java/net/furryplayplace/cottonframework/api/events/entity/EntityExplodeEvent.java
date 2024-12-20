@@ -4,8 +4,8 @@ import lombok.Getter;
 import lombok.Setter;
 import net.furryplayplace.cottonframework.api.Location;
 import net.furryplayplace.cottonframework.api.events.Cancellable;
-import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
+import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -13,12 +13,12 @@ import java.util.List;
 public class EntityExplodeEvent extends EntityEvent implements Cancellable {
     private boolean cancel;
     private final Location location;
-    private final List<Block> blocks;
+    private final List<BlockPos> blocks;
     @Getter
     @Setter
     private float yield;
 
-    public EntityExplodeEvent(@NotNull final Entity what, @NotNull final Location location, @NotNull final List<Block> blocks, final float yield) {
+    public EntityExplodeEvent(@NotNull final Entity what, @NotNull final Location location, @NotNull final List<BlockPos> blocks, final float yield) {
         super(what);
         this.location = location;
         this.blocks = blocks;
@@ -37,7 +37,7 @@ public class EntityExplodeEvent extends EntityEvent implements Cancellable {
     }
 
     @NotNull
-    public List<Block> blockList() {
+    public List<BlockPos> blockList() {
         return blocks;
     }
 

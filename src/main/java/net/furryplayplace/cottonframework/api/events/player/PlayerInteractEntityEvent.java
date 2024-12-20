@@ -6,9 +6,6 @@ import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.player.PlayerEntity;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * Represents an event that is called when a player right clicks an entity.
- */
 public class PlayerInteractEntityEvent extends PlayerEvent implements Cancellable {
     protected Entity clickedEntity;
     boolean cancelled = false;

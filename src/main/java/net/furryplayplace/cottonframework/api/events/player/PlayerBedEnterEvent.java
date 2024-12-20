@@ -27,11 +27,6 @@ public class PlayerBedEnterEvent extends PlayerEvent implements Cancellable {
         this.bedEnterResult = bedEnterResult;
     }
 
-    @Deprecated
-    public PlayerBedEnterEvent(@NotNull PlayerEntity who, @NotNull Block bed) {
-        this(who, bed, BedEnterResult.OK);
-    }
-
     /**
      * This describes the default outcome of this event.
      *

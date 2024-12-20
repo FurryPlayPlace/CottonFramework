@@ -56,6 +56,4 @@ public abstract class MinecraftServerMixin {
         CottonFramework.getInstance().getApi().pluginManager()
                 .getEventBus().post(new WorldLoadEvent(this.getOverworld()));
     }
-
-
 }
