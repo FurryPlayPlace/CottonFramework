@@ -28,13 +28,15 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ServerPlayNetworkHandler.class)
-public class ServerPlayNetworkHandlerMixin {
+public abstract class ServerPlayNetworkHandlerMixin {
 
     @Shadow public ServerPlayerEntity player;
 
+    @Shadow public abstract ServerPlayerEntity getPlayer();
+
     @Inject(method = "onPlayerMove", at = @At(value = "RETURN"))
     public void onPlayerMove(PlayerMoveC2SPacket packet, CallbackInfo ci) {
-        PlayerEntity player = (PlayerEntity) (Object) this;
+        PlayerEntity player = getPlayer();
         if (player == null) return;
 
         Location from = new Location(player.getWorld(), player.getX(), player.getY(), player.getZ(), player.getYaw(), player.getPitch());
