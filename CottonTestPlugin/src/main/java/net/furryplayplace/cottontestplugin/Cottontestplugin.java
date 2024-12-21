@@ -11,6 +11,8 @@ import net.furryplayplace.cottonframework.api.events.block.BlockBreakEvent;
 import net.furryplayplace.cottonframework.api.events.block.BlockPlaceEvent;
 
 import net.furryplayplace.cottontestplugin.commands.TestCommand;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.PlayerManager;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
@@ -34,7 +36,11 @@ public class Cottontestplugin extends CottonPlugin  {
     }
 
     @Override
-    public void onDisable() {}
+    public void onDisable() {
+
+
+
+    }
 
     @Override
     public void onLoad() {}
@@ -48,6 +54,13 @@ public class Cottontestplugin extends CottonPlugin  {
     @Subscribe
     public void onJoin(PlayerJoinEvent event) {
         event.getPlayer().sendMessage(Text.of("Hello, world!"));
+
+        // Test of instantiation
+        if (CottonAPI.get().server().getPlayerManager().areCheatsAllowed()) {
+            event.getPlayer().sendMessage(Text.of("Cheats is allowed!"));
+        } else {
+            event.getPlayer().sendMessage(Text.of("Cheats is not allowed!"));
+        }
     }
 
     @Subscribe

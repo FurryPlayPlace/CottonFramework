@@ -1,6 +1,6 @@
 /*
 ---------------------------------------------------------------------------------
-File Name : Server
+File Name : CottonServer
 
 Developer : vakea 
 Email     : vakea@fluffici.eu
@@ -14,8 +14,15 @@ Last Modified : 20.12.2024
 
 package net.furryplayplace.cottonframework.api;
 
-import net.minecraft.server.PlayerManager;
+import lombok.Getter;
+import lombok.Setter;
+import net.minecraft.server.*;
+import net.minecraft.server.dedicated.MinecraftDedicatedServer;
 
-public interface CottonServer {
-    PlayerManager cottonFramework$playerManager();
+@Getter
+@Setter
+public class CottonServer {
+    private PlayerManager playerManager;
+    private MinecraftServer server;
+    private MinecraftDedicatedServer dedicatedServer;
 }

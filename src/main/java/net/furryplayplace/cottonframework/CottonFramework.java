@@ -18,6 +18,7 @@ import java.util.List;
 import static net.minecraft.server.command.CommandManager.literal;
 
 public class CottonFramework implements ModInitializer  {
+    @Getter
     private final Logger logger = LogManager.getLogger("CottonFramework");
 
     public static final String MOD_ID = "cottonframework";

@@ -24,6 +24,7 @@ public abstract class CottonAPI {
     }
 
     public abstract IPluginManager pluginManager();
+    public abstract CottonServer server();
 
     public static CottonAPI get() {
         return instance;

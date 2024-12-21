@@ -14,10 +14,11 @@
     "network.ServerLoginNetworkHandlerMixin",
     "network.ServerPlayNetworkHandlerMixin",
     "network.ServerQueryNetworkHandlerMixin",
-    "player.ServerPlayerEntityMixin"
+    "player.ServerPlayerEntityMixin",
+    "player.PlayerManagerMixin"
   ],
   "mixins": [
-    "player.PlayerManagerMixin"
+
   ],
   "refmap": "cottonframework-refmap.json",
   "injectors": {
