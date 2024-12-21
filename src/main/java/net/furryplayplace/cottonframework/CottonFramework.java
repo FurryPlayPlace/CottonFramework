@@ -1,13 +1,18 @@
 package net.furryplayplace.cottonframework;
 
 import com.google.common.eventbus.Subscribe;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.tree.LiteralCommandNode;
 import lombok.Getter;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.fabricmc.loader.impl.FabricLoaderImpl;
 import net.furryplayplace.cottonframework.api.CottonAPI;
 import net.furryplayplace.cottonframework.api.events.server.ServerLoadEvent;
 import net.furryplayplace.cottonframework.api.events.cotton.CottonPluginShutdown;
 import net.furryplayplace.cottonframework.contributors.ContributorManager;
+import net.minecraft.server.command.CommandManager;
+import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import org.apache.logging.log4j.LogManager;
@@ -83,9 +88,16 @@ public class CottonFramework implements ModInitializer  {
                 }));
 
                 dispatcher.register(literal("about-cotton").executes(commandContext -> {
-                    commandContext.getSource().sendFeedback(() -> Text.literal("CottonFramework v" + MOD_VERSION), false);
-                    commandContext.getSource().sendFeedback(() -> Text.literal("Developed by " + MOD_AUTHOR), false);
-                    commandContext.getSource().sendFeedback(() -> Text.literal("Visit https://github.com/FurryPlayPlace/CottonFramework for more information"), false);
+                    commandContext.getSource().sendFeedback(() -> Text.literal(Formatting.GRAY + "CottonFramework v" + MOD_VERSION), false);
+                    commandContext.getSource().sendFeedback(() -> Text.literal(Formatting.GRAY + "Developed by " + MOD_AUTHOR), false);
+                    commandContext.getSource().sendFeedback(() -> Text.literal(Formatting.GRAY + "Visit https://github.com/FurryPlayPlace/CottonFramework for more information"), false);
+                    return 0;
+                }));
+
+                dispatcher.register(literal("version").executes(commandContext -> {
+                    commandContext.getSource().sendFeedback(() -> Text.literal(Formatting.GRAY + "Current Cotton Version: v" + Formatting.AQUA + MOD_VERSION),false);
+                    commandContext.getSource().sendFeedback(() -> Text.literal(Formatting.GRAY + "Current Fabric Version: v" + Formatting.AQUA + FabricLoaderImpl.VERSION),false);
+
                     return 0;
                 }));
 
@@ -104,7 +116,21 @@ public class CottonFramework implements ModInitializer  {
                 }));
 
                 this.api.pluginManager().getCommands().forEach(command -> {
-                    dispatcher.register(literal(command.getName()).executes(commandContext -> command.execute(commandContext, commandContext.getSource().getPlayer())));
+                    LiteralArgumentBuilder<ServerCommandSource> commandBuilder = literal(command.getName());
+                    command.arguments().forEach((s, o) -> commandBuilder.then(CommandManager.argument(s, o)));
+
+                    commandBuilder.executes(commandContext -> {
+                        ServerCommandSource source = commandContext.getSource();
+                        if (source.hasPermissionLevel(command.getPermission())) {
+                            return command.execute(commandContext, source.getPlayer());
+                        } else {
+                            source.sendFeedback(() -> Text.literal(Formatting.RED + "You do not have permission to execute this command"), false);
+                        }
+
+                        return 0;
+                    });
+
+                    dispatcher.register(commandBuilder);
                     this.logger.info("Registered command: {}", command.getName());
                 });
             }

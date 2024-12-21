@@ -32,7 +32,7 @@ public class ContributorManager {
 
     public static Optional<List<Contributor>> getContributors() {
         try {
-            String REPO_URL = "https://api.github.com/repos/FurryPlayPlace/CottonFramework/contributors?per_page=100&page=1";
+            String REPO_URL = "https://api.github.com/repos/FurryPlayPlace/CottonFramework/contributors?per_page=50&page=1";
             final URL repoUrl = new URL(REPO_URL);
 
             HttpsURLConnection connection = (HttpsURLConnection) repoUrl.openConnection();

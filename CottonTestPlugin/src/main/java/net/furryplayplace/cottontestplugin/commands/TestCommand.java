@@ -14,6 +14,7 @@ Last Modified : 20.12.2024
 
 package net.furryplayplace.cottontestplugin.commands;
 
+import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import net.furryplayplace.cottonframework.api.command.AbstractCommand;
 import net.furryplayplace.cottontestplugin.Cottontestplugin;
@@ -21,9 +22,17 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 
+import java.util.Collections;
+import java.util.HashMap;
+
 public class TestCommand extends AbstractCommand {
     public TestCommand() {
         super("test-command", 0);
+    }
+
+    @Override
+    public <T> HashMap<String, ArgumentType<T>> arguments() {
+        return new HashMap<>();
     }
 
     @Override
