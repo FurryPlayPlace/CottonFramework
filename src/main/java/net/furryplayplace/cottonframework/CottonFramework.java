@@ -122,5 +122,7 @@ public class CottonFramework implements ModInitializer  {
         this.api.pluginManager().unloadPlugins();
 
         this.logger.info("All plugins have been unloaded.");
+
+        System.exit(0);
     }
 }

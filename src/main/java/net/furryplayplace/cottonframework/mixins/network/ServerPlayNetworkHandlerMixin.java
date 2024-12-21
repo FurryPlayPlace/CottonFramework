@@ -18,7 +18,9 @@ import net.furryplayplace.cottonframework.api.CottonAPI;
 import net.furryplayplace.cottonframework.api.Location;
 import net.furryplayplace.cottonframework.api.events.player.*;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.network.DisconnectionInfo;
+import net.minecraft.network.NetworkThreadUtils;
 import net.minecraft.network.message.LastSeenMessageList;
 import net.minecraft.network.message.MessageChain;
 import net.minecraft.network.message.SignedMessage;
@@ -26,6 +28,8 @@ import net.minecraft.network.packet.c2s.play.*;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
+import net.minecraft.util.Hand;
+import net.minecraft.util.math.BlockPos;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
@@ -178,6 +182,52 @@ public abstract class ServerPlayNetworkHandlerMixin {
 
         if (playerCraftRequestEvent.isCancelled()){
             ci.cancel();
+        }
+    }
+
+    /**
+     * @author
+     * @reason
+     */
+    @Overwrite
+    public void onPlayerAction(PlayerActionC2SPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, (ServerPlayNetworkHandler) (Object) this, this.player.getServerWorld());
+        BlockPos blockPos = packet.getPos();
+        this.player.updateLastActionTime();
+        PlayerActionC2SPacket.Action action = packet.getAction();
+        switch (action) {
+            case SWAP_ITEM_WITH_OFFHAND:
+                if (!this.player.isSpectator()) {
+                    ItemStack itemStack = this.player.getStackInHand(Hand.OFF_HAND);
+                    this.player.setStackInHand(Hand.OFF_HAND, this.player.getStackInHand(Hand.MAIN_HAND));
+                    this.player.setStackInHand(Hand.MAIN_HAND, itemStack);
+                    this.player.clearActiveItem();
+                }
+
+                return;
+            case DROP_ITEM:
+                if (!this.player.isSpectator()) {
+                    this.player.dropSelectedItem(false);
+                }
+
+                return;
+            case DROP_ALL_ITEMS:
+                if (!this.player.isSpectator()) {
+                    this.player.dropSelectedItem(true);
+                }
+
+                return;
+            case RELEASE_USE_ITEM:
+                this.player.stopUsingItem();
+                return;
+            case START_DESTROY_BLOCK:
+            case ABORT_DESTROY_BLOCK:
+            case STOP_DESTROY_BLOCK:
+                this.player.interactionManager.processBlockBreakingAction(blockPos, action, packet.getDirection(), this.player.getWorld().getTopY(), packet.getSequence());
+                this.player.networkHandler.updateSequence(packet.getSequence());
+                return;
+            default:
+                throw new IllegalArgumentException("Invalid player action");
         }
     }
 }

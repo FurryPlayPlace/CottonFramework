@@ -32,21 +32,10 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Environment(EnvType.SERVER)
 @Mixin(Block.class)
 public abstract class BlockMixin {
-    @Inject(method = "onBreak", at = @At("RETURN"))
-    public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player, CallbackInfoReturnable<BlockState> cir) {
-        BlockBreakEvent blockBreakEvent = new BlockBreakEvent(state.getBlock(), player);
-        blockBreakEvent.setCancelled(cir.isCancelled());
-
-        CottonFramework.getInstance().getApi()
-                .pluginManager().getEventBus().post(blockBreakEvent);
-
-        if (blockBreakEvent.isCancelled()) cir.cancel();
-    }
 
     @Inject(method = "onPlaced", at = @At("RETURN"), cancellable = true)
     public void onPlaced(World world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack itemStack, CallbackInfo ci) {

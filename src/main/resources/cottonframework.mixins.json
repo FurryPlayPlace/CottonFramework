@@ -14,8 +14,9 @@
     "network.ServerLoginNetworkHandlerMixin",
     "network.ServerPlayNetworkHandlerMixin",
     "network.ServerQueryNetworkHandlerMixin",
-    "player.ServerPlayerEntityMixin",
-    "player.PlayerManagerMixin"
+    "network.ServerPlayerInteractionManagerMixin",
+    "player.PlayerManagerMixin",
+    "player.ServerPlayerEntityMixin"
   ],
   "mixins": [
 

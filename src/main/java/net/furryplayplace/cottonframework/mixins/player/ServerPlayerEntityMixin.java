@@ -21,6 +21,7 @@ import net.minecraft.block.BedBlock;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.s2c.play.PositionFlag;
@@ -184,5 +185,11 @@ public abstract class ServerPlayerEntityMixin {
 
         CottonAPI.get().pluginManager().getEventBus()
                 .post(new PlayerQuitEvent(player));
+    }
+
+    @Inject(method = "onDeath", at = @At("HEAD"))
+    public void onDeath(DamageSource source, CallbackInfo ci) {
+        PlayerDeathEvent event = new PlayerDeathEvent((ServerPlayerEntity)(Object)this);
+        CottonAPI.get().pluginManager().getEventBus().post(event);
     }
 }
