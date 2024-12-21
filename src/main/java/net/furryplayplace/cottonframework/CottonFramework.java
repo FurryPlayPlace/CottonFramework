@@ -1,30 +1,48 @@
 package net.furryplayplace.cottonframework;
 
 import com.google.common.eventbus.Subscribe;
-import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import com.mojang.brigadier.tree.LiteralCommandNode;
+import com.mojang.authlib.GameProfile;
 import lombok.Getter;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
-import net.fabricmc.loader.impl.FabricLoaderImpl;
+import net.fabricmc.fabric.api.util.TriState;
+import net.fabricmc.loader.api.FabricLoader;
 import net.furryplayplace.cottonframework.api.CottonAPI;
-import net.furryplayplace.cottonframework.api.events.server.ServerLoadEvent;
 import net.furryplayplace.cottonframework.api.events.cotton.CottonPluginShutdown;
+import net.furryplayplace.cottonframework.api.permissions.v0.PermissionCheckEvent;
+import net.furryplayplace.cottonframework.api.permissions.v1.CottonPermissions;
+import net.furryplayplace.cottonframework.api.permissions.v1.Permissible;
+import net.furryplayplace.cottonframework.api.permissions.v1.Permission;
+import net.furryplayplace.cottonframework.api.permissions.v1.PermissionDefaults;
+import net.furryplayplace.cottonframework.configuration.PermissionConfiguration;
 import net.furryplayplace.cottonframework.contributors.ContributorManager;
-import net.minecraft.server.command.CommandManager;
+import net.furryplayplace.cottonframework.manager.command.AboutCommand;
+import net.furryplayplace.cottonframework.manager.command.PermissionCommand;
+import net.furryplayplace.cottonframework.manager.command.PluginsCommand;
+import net.furryplayplace.cottonframework.manager.command.VersionCommand;
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.minecraft.server.network.ServerPlayerEntity;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.List;
-
-import static net.minecraft.server.command.CommandManager.literal;
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Objects;
+import java.util.UUID;
 
 public class CottonFramework implements ModInitializer  {
     @Getter
     private final Logger logger = LogManager.getLogger("CottonFramework");
+
+    @Getter
+    private final File dataFolder = new File(FabricLoader.getInstance().getConfigDir().toFile(), ".cotton");
+
+    @Getter
+    private final File permissionsFolder = new File(dataFolder, "users");
+
+    @Getter
+    private final File groupsFolder = new File(permissionsFolder, "groups");
 
     public static final String MOD_ID = "cottonframework";
     public static final String MOD_NAME = "Cotton Framework";
@@ -37,9 +55,16 @@ public class CottonFramework implements ModInitializer  {
     @Getter
     public final CottonAPI api = new BaseCottonAPI();
 
+    public static HashMap<String, PermissionConfiguration> groups = new HashMap<>();
+    public static HashMap<String, PermissionConfiguration> users = new HashMap<>();
+
     @Override
     public void onInitialize() {
         instance = this;
+
+        dataFolder.mkdirs();
+        permissionsFolder.mkdirs();
+        groupsFolder.mkdirs();
 
         this.logger.info("   ******    *******   ********** **********   *******   ****     **");
         this.logger.info("  **////**  **/////** /////**/// /////**///   **/////** /**/**   /**");
@@ -73,67 +98,57 @@ public class CottonFramework implements ModInitializer  {
         this.api.pluginManager().loadPlugins();
         CottonAPI.get().pluginManager().enableAllPlugins();
 
+        PermissionCommand cmd = new PermissionCommand();
+        PluginsCommand plugins = new PluginsCommand();
+        VersionCommand versionCommand = new VersionCommand();
+        AboutCommand aboutCommand = new AboutCommand();
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
-            if (environment.dedicated) {
-                dispatcher.register(literal("plugins").executes(commandContext -> {
-                    List<String> pluginNames = this.api.pluginManager().getPluginsWithContainer().stream()
-                            .map(cottonPlugin -> switch (cottonPlugin.getState()) {
-                                case FAILURE, DISABLED, UNKNOWN -> Formatting.RED + cottonPlugin.getPlugin().name();
-                                case ENABLED -> Formatting.GREEN + cottonPlugin.getPlugin().name();
-                                case LOADED -> Formatting.GRAY + cottonPlugin.getPlugin().name();
-                            }).toList();
+            cmd.register(dispatcher, "perms");
+            cmd.register(dispatcher, "cotton-permissions");
+            plugins.register(dispatcher, "plugins");
+            plugins.register(dispatcher, "pl");
+            versionCommand.register(dispatcher, "version");
+            aboutCommand.register(dispatcher, "about");
 
-                    commandContext.getSource().sendFeedback(() -> Text.literal("Loaded plugins: " + String.join(", ", pluginNames)), false);
-                    return 0;
-                }));
+            this.api.pluginManager().getCommands().forEach(command -> {
+                command.register(dispatcher, command.getName());
+                this.logger.info("Registered command: {}", command.getName());
+            });
+        });
 
-                dispatcher.register(literal("about-cotton").executes(commandContext -> {
-                    commandContext.getSource().sendFeedback(() -> Text.literal(Formatting.GRAY + "CottonFramework v" + MOD_VERSION), false);
-                    commandContext.getSource().sendFeedback(() -> Text.literal(Formatting.GRAY + "Developed by " + MOD_AUTHOR), false);
-                    commandContext.getSource().sendFeedback(() -> Text.literal(Formatting.GRAY + "Visit https://github.com/FurryPlayPlace/CottonFramework for more information"), false);
-                    return 0;
-                }));
+        for (File f : Objects.requireNonNull(groupsFolder.listFiles())) {
+            PermissionConfiguration conf = new PermissionConfiguration(f);
+            groups.put(conf.name, conf);
+        }
 
-                dispatcher.register(literal("version").executes(commandContext -> {
-                    commandContext.getSource().sendFeedback(() -> Text.literal(Formatting.GRAY + "Current Cotton Version: v" + Formatting.AQUA + MOD_VERSION),false);
-                    commandContext.getSource().sendFeedback(() -> Text.literal(Formatting.GRAY + "Current Fabric Version: v" + Formatting.AQUA + FabricLoaderImpl.VERSION),false);
-
-                    return 0;
-                }));
-
-                dispatcher.register(literal("reload").executes(commandContext -> {
-                    this.api.pluginManager().unloadPlugins();
-                    this.api.pluginManager().loadPlugins();
-                    CottonAPI.get().pluginManager().enableAllPlugins();
-
-                    ServerLoadEvent serverLoadEvent = new ServerLoadEvent(ServerLoadEvent.LoadType.RELOAD);
-                    CottonFramework.getInstance().getApi().pluginManager()
-                            .getEventBus().post(serverLoadEvent);
-
-                    commandContext.getSource().sendFeedback(() -> Text.literal(Formatting.GRAY + "Plugins have been reloaded."), true);
-
-                    return 1;
-                }));
-
-                this.api.pluginManager().getCommands().forEach(command -> {
-                    LiteralArgumentBuilder<ServerCommandSource> commandBuilder = literal(command.getName());
-                    command.arguments().forEach((s, o) -> commandBuilder.then(CommandManager.argument(s, o)));
-
-                    commandBuilder.executes(commandContext -> {
-                        ServerCommandSource source = commandContext.getSource();
-                        if (source.hasPermissionLevel(command.getPermission())) {
-                            return command.execute(commandContext, source.getPlayer());
-                        } else {
-                            source.sendFeedback(() -> Text.literal(Formatting.RED + "You do not have permission to execute this command"), false);
-                        }
-
-                        return 0;
-                    });
-
-                    dispatcher.register(commandBuilder);
-                    this.logger.info("Registered command: {}", command.getName());
-                });
+        if (!groups.containsKey("default")) {
+            try {
+                PermissionConfiguration conf = new PermissionConfiguration("default");
+                groups.put(conf.name, conf);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
+        }
+
+        for (File f : Objects.requireNonNull(permissionsFolder.listFiles())) {
+            PermissionConfiguration conf = new PermissionConfiguration(f);
+            users.put(conf.uuid, conf);
+        }
+
+        PermissionCheckEvent.EVENT.register((source, permission) -> {
+            if (source instanceof ServerCommandSource ss) {
+                try {
+                    ServerPlayerEntity plr = ss.getPlayer();
+                    Permissible p = CottonPermissions.getPlayerPermissible(plr);
+                    Permission perm = new Permission(permission, "LuckPerms API provided permission", PermissionDefaults.OPERATOR);
+                    boolean hass = p.hasPermission(perm);
+                    if (hass) {
+                        return TriState.TRUE;
+                    }
+                } catch (Exception ignored) {}
+            }
+
+            return TriState.DEFAULT;
         });
 
         this.logger.info("All plugins have been initialized.");
@@ -150,5 +165,41 @@ public class CottonFramework implements ModInitializer  {
         this.logger.info("All plugins have been unloaded.");
 
         System.exit(0);
+    }
+
+    public static GameProfile findGameProfile(ServerCommandSource cs, String name) {
+        if (name.length() >= 32)
+            return cs.getServer().getUserCache().getByUuid(UUID.fromString(name)).get();
+        return cs.getServer().getUserCache().findByName(name).get();
+    }
+
+    public static PermissionConfiguration getUser(GameProfile profile) {
+        String uuid = profile.getId().toString();
+        if (users.containsKey(uuid))
+            return users.get(uuid);
+
+        try {
+            PermissionConfiguration conf = new PermissionConfiguration(profile);
+            users.put(conf.uuid, conf);
+            return conf;
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
+    public static PermissionConfiguration getUser(ServerPlayerEntity e) {
+        String uuid = e.getUuid().toString();
+        if (users.containsKey(uuid))
+            return users.get(uuid);
+
+        try {
+            PermissionConfiguration conf = new PermissionConfiguration(e);
+            users.put(conf.uuid, conf);
+            return conf;
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return null;
+        }
     }
 }

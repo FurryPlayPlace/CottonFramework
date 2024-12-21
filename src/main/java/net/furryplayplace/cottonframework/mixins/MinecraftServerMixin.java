@@ -17,6 +17,8 @@ package net.furryplayplace.cottonframework.mixins;
 import net.furryplayplace.cottonframework.api.events.cotton.CottonPluginShutdown;
 import net.furryplayplace.cottonframework.CottonFramework;
 import net.furryplayplace.cottonframework.api.events.world.WorldLoadEvent;
+import net.furryplayplace.cottonframework.api.permissions.v1.Permissible;
+import net.furryplayplace.cottonframework.api.permissions.v1.Permission;
 import net.minecraft.server.*;
 import net.minecraft.server.world.ServerWorld;
 import org.spongepowered.asm.mixin.*;
@@ -25,7 +27,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(MinecraftServer.class)
-public abstract class MinecraftServerMixin {
+public abstract class MinecraftServerMixin implements Permissible {
     @Shadow public abstract ServerWorld getOverworld();
 
     @Inject(method = "stop", at = @At(value = "HEAD"))
@@ -39,4 +41,18 @@ public abstract class MinecraftServerMixin {
         CottonFramework.getInstance().getApi().pluginManager()
                 .getEventBus().post(new WorldLoadEvent(this.getOverworld()));
     }
+
+
+    @Override
+    public boolean hasPermission(Permission id) {
+        return true;
+    }
+
+    @Override
+    public boolean isHighLevelOperator() {
+        return true;
+    }
+
+    @Override
+    public void setPermission(Permission id, boolean value) {}
 }

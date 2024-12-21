@@ -36,7 +36,7 @@ public class TestCommand extends AbstractCommand {
     }
 
     @Override
-    public int execute(CommandContext<ServerCommandSource> context, ServerPlayerEntity sender) {
+    public int execute(CommandContext<ServerCommandSource> context, ServerPlayerEntity sender, String[] args) {
 
         context.getSource().sendFeedback(() -> Text.of("Test command executed!"), false);
         context.getSource().sendFeedback(() -> Text.of( "Test config: " + Cottontestplugin.getInstance().getConfig().getString("test.login", "vakea")), false);

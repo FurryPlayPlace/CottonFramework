@@ -14,9 +14,13 @@ Last Modified : 20.12.2024
 
 package net.furryplayplace.cottonframework.mixins.player;
 
+import net.furryplayplace.cottonframework.CottonFramework;
 import net.furryplayplace.cottonframework.api.CottonAPI;
 import net.furryplayplace.cottonframework.api.Location;
 import net.furryplayplace.cottonframework.api.events.player.*;
+import net.furryplayplace.cottonframework.api.permissions.v1.Permissible;
+import net.furryplayplace.cottonframework.api.permissions.v1.Permission;
+import net.furryplayplace.cottonframework.configuration.PermissionConfiguration;
 import net.minecraft.block.BedBlock;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
@@ -45,7 +49,9 @@ import java.util.EnumSet;
 import java.util.Set;
 
 @Mixin(ServerPlayerEntity.class)
-public abstract class ServerPlayerEntityMixin {
+public abstract class ServerPlayerEntityMixin implements Permissible {
+
+    private PermissionConfiguration cyberPermConfig;
 
     @Shadow @Final public MinecraftServer server;
 
@@ -191,5 +197,23 @@ public abstract class ServerPlayerEntityMixin {
     public void onDeath(DamageSource source, CallbackInfo ci) {
         PlayerDeathEvent event = new PlayerDeathEvent((ServerPlayerEntity)(Object)this);
         CottonAPI.get().pluginManager().getEventBus().post(event);
+    }
+
+    @Override
+    public boolean hasPermission(Permission id) {
+        if (null == cyberPermConfig)
+            cyberPermConfig = CottonFramework.getUser((ServerPlayerEntity)(Object)this);
+        return cyberPermConfig.hasPermission(id.getPermissionAsString());
+    }
+
+    @Override
+    public boolean isHighLevelOperator() {
+        ServerPlayerEntity e = (ServerPlayerEntity)(Object)this;
+        return e.getServer().getPermissionLevel(e.getGameProfile()) >= 1;
+    }
+
+    @Override
+    public void setPermission(Permission id, boolean value) {
+        cyberPermConfig.setPermission(id, value);
     }
 }
