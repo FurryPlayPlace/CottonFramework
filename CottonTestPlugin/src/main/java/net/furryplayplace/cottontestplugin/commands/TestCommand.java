@@ -27,7 +27,7 @@ import java.util.HashMap;
 
 public class TestCommand extends AbstractCommand {
     public TestCommand() {
-        super("test-command", 0);
+        super("test-command", true, "test");
     }
 
     @Override
