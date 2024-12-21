@@ -38,8 +38,6 @@ dependencies {
     compileOnly("org.projectlombok:lombok:" + property("lombok_version"))
     compileOnly("com.google.guava:guava:33.4.0-jre")
 
-    modImplementation("com.javazilla.mods:permissions:1.3")
-
     annotationProcessor("org.projectlombok:lombok:" + property("lombok_version"))
 }
 
