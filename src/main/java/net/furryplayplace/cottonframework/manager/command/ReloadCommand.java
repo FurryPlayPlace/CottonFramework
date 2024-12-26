@@ -52,7 +52,7 @@ public class ReloadCommand implements com.mojang.brigadier.Command<ServerCommand
 
     @Override
     public boolean test(ServerCommandSource t) {
-        return true;
+        return t.hasPermissionLevel(4) || t.hasPermissionLevel(3);
     }
 
     @Override

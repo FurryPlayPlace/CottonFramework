@@ -38,7 +38,7 @@ import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
 public class PluginManager implements IPluginManager {
     private final Logger logger = LogManager.getLogger("PluginManager");
     private final HashMap<String, PluginContainer<CottonPlugin>> plugins = new HashMap<>();
-    private final HashMap<CottonPlugin, AbstractCommand> commands = new HashMap<>();
+    private final List<AbstractCommand> commands = new ArrayList<>();
 
     private final AsyncEventBus eventBus = new AsyncEventBus("CottonEventBus", directExecutor());
 
@@ -473,13 +473,13 @@ public class PluginManager implements IPluginManager {
 
     @Override
     public void registerCommand(CottonPlugin plugin, AbstractCommand command) {
-        this.commands.put(plugin, command);
+        this.commands.add(command);
         this.logger.info("Registered command {} plugin {}", command.getName(), plugin.name());
     }
 
     @Override
     public void unregisterCommand(CottonPlugin plugin, AbstractCommand command) {
-        this.commands.remove(plugin, command);
+        this.commands.remove(command);
         this.logger.info("Unregistered command {} plugin {}", command.getName(), plugin.name());
     }
 
@@ -491,6 +491,6 @@ public class PluginManager implements IPluginManager {
 
     @Override
     public List<AbstractCommand> getCommands() {
-        return new ArrayList<>(this.commands.values());
+        return new ArrayList<>(this.commands);
     }
 }

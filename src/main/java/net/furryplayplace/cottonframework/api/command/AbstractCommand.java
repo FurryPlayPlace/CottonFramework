@@ -34,7 +34,6 @@ import net.furryplayplace.cottonframework.api.permissions.v1.Permission;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 
-import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Predicate;
 
@@ -45,14 +44,11 @@ public abstract class AbstractCommand implements Command<ServerCommandSource>, P
     private final boolean onlyPlayer;
     private final String permission;
 
-    public abstract <T> HashMap<String, ArgumentType<T>> arguments();
-
     public abstract int execute(CommandContext<ServerCommandSource> context, ServerPlayerEntity sender, String[] args);
 
     public LiteralCommandNode<ServerCommandSource> register(CommandDispatcher<ServerCommandSource> dispatcher, String label) {
-        return dispatcher.register(
-                LiteralArgumentBuilder.<ServerCommandSource>literal(label).requires(this).executes(this)
-                        .then(RequiredArgumentBuilder.<ServerCommandSource, String>argument("args", StringArgumentType.greedyString()).suggests(this).executes(this))
+        return dispatcher.register(LiteralArgumentBuilder.<ServerCommandSource>literal(label).requires(this).executes(this)
+                .then(RequiredArgumentBuilder.<ServerCommandSource, String>argument("args", StringArgumentType.greedyString()).suggests(this).executes(this))
         );
     }
 
