@@ -44,6 +44,13 @@ public abstract class AbstractCommand implements Command<ServerCommandSource>, P
     private final boolean onlyPlayer;
     private final String permission;
 
+    public static void main(String[] args) {
+        String command = "home owo pwp owo";
+
+
+
+    }
+
     public abstract int execute(CommandContext<ServerCommandSource> context, ServerPlayerEntity sender, String[] args);
 
     public LiteralCommandNode<ServerCommandSource> register(CommandDispatcher<ServerCommandSource> dispatcher, String label) {
@@ -59,9 +66,13 @@ public abstract class AbstractCommand implements Command<ServerCommandSource>, P
                 return 0;
             }
 
-            String[] args = context.getInput().substring(this.name.length()+1).split(" ");
+            String command = context.getInput();
+            String[] arguments = command.split(" ");
 
-            return this.execute(context, context.getSource().getPlayer(), args);
+            int startIndex = arguments[0].length() + 1;
+            String[] betterArgs = (startIndex < command.length()) ? command.substring(startIndex).split(" ") : new String[0];
+
+            return this.execute(context, context.getSource().getPlayer(), betterArgs);
         } catch (Exception e) {
             e.printStackTrace();
             return 0;
