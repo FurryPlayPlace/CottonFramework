@@ -59,7 +59,7 @@ public abstract class AbstractCommand implements Command<ServerCommandSource>, P
                 return 0;
             }
 
-            String[] args = context.getInput().split(" ");
+            String[] args = context.getInput().substring(this.name.length()+1).split(" ");
 
             return this.execute(context, context.getSource().getPlayer(), args);
         } catch (Exception e) {
