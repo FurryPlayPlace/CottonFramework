@@ -269,7 +269,7 @@ public class SafeConstructor extends BaseConstructor {
       } else if (value.indexOf(':') != -1) {
         String[] digits = value.split(":");
         int bes = 1;
-        int val = 0;
+        long val = 0;
         for (int i = 0, j = digits.length; i < j; i++) {
           val += Long.parseLong(digits[j - i - 1]) * bes;
           bes *= 60;
