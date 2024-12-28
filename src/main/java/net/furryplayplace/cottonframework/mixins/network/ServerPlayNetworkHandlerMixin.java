@@ -36,6 +36,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 @Mixin(ServerPlayNetworkHandler.class)
 public abstract class ServerPlayNetworkHandlerMixin {
@@ -48,13 +49,16 @@ public abstract class ServerPlayNetworkHandlerMixin {
 
     @Shadow protected abstract Optional<LastSeenMessageList> validateAcknowledgment(LastSeenMessageList.Acknowledgment acknowledgment);
 
-    @Inject(method = "onVehicleMove", at = @At("RETURN"), cancellable = true)
+    @Inject(method = "onVehicleMove", at = @At("HEAD"), cancellable = true)
     public void onVehicleMove(VehicleMoveC2SPacket packet, CallbackInfo ci) {
         PlayerEntity player = getPlayer();
         if (player == null) return;
 
         Location from = new Location(player.getWorld(), player.getX(), player.getY(), player.getZ(), player.getYaw(), player.getPitch());
         Location to = new Location(player.getWorld(), packet.getX(), packet.getY(), packet.getZ(), packet.getYaw(), packet.getPitch());
+
+        // Avoiding pinging packets to come through
+        if (Objects.equals(from, to)) return;
 
         PlayerVehicleMoveEvent playerVehicleMoveEvent = new PlayerVehicleMoveEvent(player, from, to);
 
@@ -64,20 +68,36 @@ public abstract class ServerPlayNetworkHandlerMixin {
         if (playerVehicleMoveEvent.isCancelled()) ci.cancel();
     }
 
-    @Inject(method = "onPlayerMove", at = @At(value = "RETURN"), cancellable = true)
+    @Inject(method = "onPlayerMove", at = @At(value = "HEAD"), cancellable = true)
     public void onPlayerMove(PlayerMoveC2SPacket packet, CallbackInfo ci) {
         PlayerEntity player = getPlayer();
         if (player == null) return;
 
         Location from = new Location(player.getWorld(), player.getX(), player.getY(), player.getZ(), player.getYaw(), player.getPitch());
-        Location to = new Location(player.getWorld(), packet.getX(player.getX()), packet.getY(player.getY()), packet.getZ(player.getZ()), packet.getYaw(player.getYaw()), packet.getPitch(player.getPitch()));
+        Location to = new Location(player.getWorld(),
+                packet.getX(player.getX()),
+                packet.getY(player.getY()),
+                packet.getZ(player.getZ()),
+                packet.getYaw(player.getYaw()),
+                packet.getPitch(player.getPitch()));
 
-        PlayerMoveEvent playerMoveEvent = new PlayerMoveEvent(player, from, to);
+        if (!packet.changesPosition() && !packet.changesLook()) return;
 
-        CottonAPI.get().pluginManager().getEventBus()
-                .post(playerMoveEvent);
+        PlayerMoveEvent moveEvent = new PlayerMoveEvent(player, from, to);
+        CottonAPI.get().pluginManager().getEventBus().post(moveEvent);
 
-        if (playerMoveEvent.isCancelled()) ci.cancel();
+        if (moveEvent.isCancelled()) {
+            if (moveEvent.isAsynchronous()) {
+                CompletableFuture.runAsync(() -> {
+                    player.teleport(from.getX(), from.getY(), from.getZ(), true);
+                    player.getServer().executeSync(ci::cancel);
+                });
+            } else {
+                // Synchronous cancellation
+                player.teleport(from.getX(), from.getY(), from.getZ(), true);
+                ci.cancel();
+            }
+        }
     }
 
     /**
@@ -124,7 +144,7 @@ public abstract class ServerPlayNetworkHandlerMixin {
         if (playerSetBeaconEffectEvent.isCancelled()) ci.cancel();
     }
 
-    @Inject(method = "onDisconnected", at = @At("RETURN"))
+    @Inject(method = "onDisconnected", at = @At("HEAD"))
     public void onDisconnected(DisconnectionInfo info, CallbackInfo ci) {
         PlayerEntity player = getPlayer();
         if (player == null) return;
@@ -166,7 +186,7 @@ public abstract class ServerPlayNetworkHandlerMixin {
         }
     }
 
-    @Inject(method = "onCraftRequest", at = @At("RETURN"), cancellable = true)
+    @Inject(method = "onCraftRequest", at = @At("HEAD"), cancellable = true)
     public void onCraftRequest(CraftRequestC2SPacket packet, CallbackInfo ci) {
         PlayerEntity player = getPlayer();
         if (player == null) return;

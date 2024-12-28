@@ -75,7 +75,7 @@ public abstract class ServerPlayerInteractionManagerMixin {
 
     @Shadow @Final private static Logger LOGGER;
 
-    @Inject(method = "changeGameMode", at = @At("RETURN"))
+    @Inject(method = "changeGameMode", at = @At("HEAD"))
     public void changeGameMode(GameMode gameMode, CallbackInfoReturnable<Boolean> cir) {
         PlayerGameModeChangeEvent playerGameModeChangeEvent = new PlayerGameModeChangeEvent(this.player, gameMode);
 

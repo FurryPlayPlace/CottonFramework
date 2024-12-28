@@ -122,7 +122,6 @@ public abstract class ServerPlayerEntityMixin implements Permissible {
         if (player == null) return;
 
         PlayerInteractEntityEvent playerInteractEntityEvent = new PlayerInteractEntityEvent(player, target);
-        playerInteractEntityEvent.setCancelled(ci.isCancelled());
 
         CottonAPI.get().pluginManager().getEventBus()
                 .post(playerInteractEntityEvent);
@@ -157,7 +156,7 @@ public abstract class ServerPlayerEntityMixin implements Permissible {
         }
     }
 
-    @Inject(method = "wakeUp", at = @At("RETURN"), cancellable = true)
+    @Inject(method = "wakeUp", at = @At("HEAD"), cancellable = true)
     public void onWakeUp(boolean skipSleepTimer, boolean updateSleepingPlayers, CallbackInfo ci) {
         PlayerEntity player = (PlayerEntity) (Object) this;
         if (player == null) return;

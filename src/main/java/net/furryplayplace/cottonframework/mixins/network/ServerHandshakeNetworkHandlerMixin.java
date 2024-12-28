@@ -31,7 +31,7 @@ public class ServerHandshakeNetworkHandlerMixin {
 
     @Shadow @Final private ClientConnection connection;
 
-    @Inject(method = "login", at = @At("RETURN"))
+    @Inject(method = "login", at = @At("HEAD"))
     public void onLogin(HandshakeC2SPacket packet, boolean transfer, CallbackInfo ci) {
         PlayerLoginEvent playerLoginEvent = new PlayerLoginEvent(connection, packet.address());
 

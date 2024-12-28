@@ -38,7 +38,7 @@ public class ServerQueryNetworkHandlerMixin {
 
     @Shadow @Final private ClientConnection connection;
 
-    @Inject(method = "onRequest", at = @At("RETURN"))
+    @Inject(method = "onRequest", at = @At("HEAD"))
     public void onRequest(QueryRequestC2SPacket packet, CallbackInfo ci) {
         ServerMetadata metadata = this.metadata;
         ClientConnection connection = this.connection;
