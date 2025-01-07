@@ -31,7 +31,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class DedicatedServerMixin {
     @Shadow public abstract PlayerManager getPlayerManager();
 
-    @Inject(method = "setupServer", at = @At(value = "RETURN"))
+    @Inject(
+            method = "setupServer",
+            at = @At(value = "RETURN")
+    )
     private void initServer(CallbackInfoReturnable<Boolean> cir) {
         CottonFramework.getInstance().getApi().pluginManager()
                         .getEventBus().post(new CottonPluginInitialize());

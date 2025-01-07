@@ -14,6 +14,7 @@ Last Modified : 20.12.2024
 
 package net.furryplayplace.cottonframework.mixins.network;
 
+import net.furryplayplace.cottonframework.CottonFramework;
 import net.furryplayplace.cottonframework.api.CottonAPI;
 import net.furryplayplace.cottonframework.api.Location;
 import net.furryplayplace.cottonframework.api.events.player.*;
@@ -41,6 +42,12 @@ import java.util.concurrent.CompletableFuture;
 @Mixin(ServerPlayNetworkHandler.class)
 public abstract class ServerPlayNetworkHandlerMixin {
 
+    @Shadow
+    private static double clampHorizontal(double d) { return 0; }
+
+    @Shadow
+    private static double clampVertical(double d) { return 0; }
+
     @Shadow public ServerPlayerEntity player;
 
     @Shadow public abstract ServerPlayerEntity getPlayer();
@@ -49,7 +56,11 @@ public abstract class ServerPlayNetworkHandlerMixin {
 
     @Shadow protected abstract Optional<LastSeenMessageList> validateAcknowledgment(LastSeenMessageList.Acknowledgment acknowledgment);
 
-    @Inject(method = "onVehicleMove", at = @At("HEAD"), cancellable = true)
+    @Inject(
+            method = "onVehicleMove",
+            at = @At("HEAD"),
+            cancellable = true
+    )
     public void onVehicleMove(VehicleMoveC2SPacket packet, CallbackInfo ci) {
         PlayerEntity player = getPlayer();
         if (player == null) return;
@@ -57,10 +68,10 @@ public abstract class ServerPlayNetworkHandlerMixin {
         Location from = new Location(player.getWorld(), player.getX(), player.getY(), player.getZ(), player.getYaw(), player.getPitch());
         Location to = new Location(player.getWorld(), packet.getX(), packet.getY(), packet.getZ(), packet.getYaw(), packet.getPitch());
 
-        // Avoiding pinging packets to come through
-        if (Objects.equals(from, to)) return;
-
         PlayerVehicleMoveEvent playerVehicleMoveEvent = new PlayerVehicleMoveEvent(player, from, to);
+
+        // Avoiding pinging packets to come through
+        if (!playerVehicleMoveEvent.hasChangedPosition()) return;
 
         CottonAPI.get().pluginManager().getEventBus()
                 .post(playerVehicleMoveEvent);
@@ -68,7 +79,11 @@ public abstract class ServerPlayNetworkHandlerMixin {
         if (playerVehicleMoveEvent.isCancelled()) ci.cancel();
     }
 
-    @Inject(method = "onPlayerMove", at = @At(value = "HEAD"), cancellable = true)
+    @Inject(
+            method = "onPlayerMove",
+            at = @At(value = "HEAD"),
+            cancellable = true
+    )
     public void onPlayerMove(PlayerMoveC2SPacket packet, CallbackInfo ci) {
         PlayerEntity player = getPlayer();
         if (player == null) return;
@@ -131,7 +146,8 @@ public abstract class ServerPlayNetworkHandlerMixin {
                     from = @At(value = "HEAD", target = "Lnet/minecraft/screen/ScreenHandler;canUse(Lnet/minecraft/entity/player/PlayerEntity;)Z"),
                     to = @At(value = "TAIL", target = "Lnet/minecraft/screen/BeaconScreenHandler;setEffects(Ljava/util/Optional;Ljava/util/Optional;)V")
             ),
-            cancellable = true)
+            cancellable = true
+    )
     public void onUpdateBeacon(UpdateBeaconC2SPacket packet, CallbackInfo ci) {
         PlayerEntity player = getPlayer();
         if (player == null) return;
@@ -198,6 +214,65 @@ public abstract class ServerPlayNetworkHandlerMixin {
 
         if (playerCraftRequestEvent.isCancelled()){
             ci.cancel();
+        }
+    }
+
+    /**
+     * This code was originally made for the mod Gotta Go Fast! version 1.1.0 for Minecraft 1.20
+     * Repository: https://github.com/oskardotglobal/gottagofast-fabric
+     * <p>
+     * Has the mod became inactive in terms of Update we decided to copy this implementation and edit it to feat CottonFramework needs.
+     *
+     * @author Oskardotglobal
+     */
+    @Inject(
+            method = "onPlayerMove(Lnet/minecraft/network/packet/c2s/play/PlayerMoveC2SPacket;)V",
+            cancellable = true,
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lorg/slf4j/Logger;warn(Ljava/lang/String;[Ljava/lang/Object;)V",
+                    shift = At.Shift.BEFORE
+            )
+    )
+    private void onPlayerMoveFix(PlayerMoveC2SPacket packet, CallbackInfo ci) {
+        if (!CottonFramework.getInstance().getConfiguration().getBoolean("gotta-go-fast.fix-player-move-spam", true)) {
+            ServerPlayNetworkHandler instance = ((ServerPlayNetworkHandler)(Object)this);
+
+            int playerLimit = CottonFramework.getInstance().getConfiguration().getInt("gotta-go-fast.player-limit", 100);
+            int playerMoveLimit = CottonFramework.getInstance().getConfiguration().getInt("gotta-go-fast.player-move-limit", 300);
+
+            double x = clampHorizontal(packet.getX(instance.player.getX()));
+            double y = clampVertical(packet.getY(instance.player.getY()));
+            double z = clampHorizontal(packet.getZ(instance.player.getZ()));
+
+            double distanceXFromLastTick = x - instance.lastTickX;
+            double distanceYFromLastTick = y - instance.lastTickY;
+            double distanceZFromLastTick = z - instance.lastTickZ;
+
+            double velocity = instance.player.getVelocity().lengthSquared();
+
+            double distance = distanceXFromLastTick * distanceXFromLastTick
+                    + distanceYFromLastTick * distanceYFromLastTick
+                    + distanceZFromLastTick * distanceZFromLastTick;
+
+            int packetCount = instance.movePacketsCount - instance.lastTickMovePacketsCount;
+            float threshold = instance.player.isFallFlying() ? (float) playerMoveLimit : (float) playerLimit;
+
+            if (distance - velocity > (double)(threshold * (float) packetCount) && !instance.isHost()) {
+                if (CottonFramework.getInstance().getConfiguration().getBoolean("gotta-go-fast.log-player-move-spam", true)) {
+                    CottonFramework.getInstance().getLogger().warn(
+                            "[GottaGoFast/CottonFramework] {} moved too quickly! Moved by {},{},{} blocks in x,y,z direction. If you wish to increase the limit to exclude this, increase the limit to {}",
+                            instance.player.getName().getString(),
+                            distanceXFromLastTick,
+                            distanceYFromLastTick,
+                            distanceZFromLastTick,
+                            (distance - velocity) / packetCount
+                    );
+                }
+
+                instance.requestTeleport(instance.player.getX(), instance.player.getY(), instance.player.getZ(), instance.player.getYaw(), instance.player.getPitch());
+                ci.cancel();
+            }
         }
     }
 }

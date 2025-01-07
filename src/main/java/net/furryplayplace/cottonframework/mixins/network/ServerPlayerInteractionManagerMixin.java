@@ -85,8 +85,10 @@ public abstract class ServerPlayerInteractionManagerMixin {
     }
 
     /**
-     * @author
-     * @reason
+     * Is this the best way to do that?..
+     *
+     * @author vakea
+     * @reason Hooking block events for players
      */
     @Overwrite
     public void processBlockBreakingAction(BlockPos pos, PlayerActionC2SPacket.Action action, Direction direction, int worldHeight, int sequence) {

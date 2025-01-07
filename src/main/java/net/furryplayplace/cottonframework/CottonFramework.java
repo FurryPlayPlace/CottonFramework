@@ -8,6 +8,8 @@ import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.util.TriState;
 import net.fabricmc.loader.api.FabricLoader;
 import net.furryplayplace.cottonframework.api.CottonAPI;
+import net.furryplayplace.cottonframework.api.configuration.file.FileConfiguration;
+import net.furryplayplace.cottonframework.api.configuration.file.YamlConfiguration;
 import net.furryplayplace.cottonframework.api.events.cotton.CottonPluginShutdown;
 import net.furryplayplace.cottonframework.api.permissions.v0.PermissionCheckEvent;
 import net.furryplayplace.cottonframework.api.permissions.v1.CottonPermissions;
@@ -46,7 +48,7 @@ public class CottonFramework implements ModInitializer  {
 
     public static final String MOD_ID = "cottonframework";
     public static final String MOD_NAME = "Cotton Framework";
-    public static final String MOD_VERSION = "${version}";
+    public static final String MOD_VERSION = FabricLoader.getInstance().getModContainer(MOD_ID).get().getMetadata().getVersion().getFriendlyString() + " (Fabric)";
     public static final String MOD_AUTHOR = "Vakea";
 
     @Getter
@@ -57,6 +59,9 @@ public class CottonFramework implements ModInitializer  {
 
     public static HashMap<String, PermissionConfiguration> groups = new HashMap<>();
     public static HashMap<String, PermissionConfiguration> users = new HashMap<>();
+
+    @Getter
+    public final FileConfiguration configuration = YamlConfiguration.loadConfiguration(new File(dataFolder, "config.yml"));
 
     @Override
     public void onInitialize() {

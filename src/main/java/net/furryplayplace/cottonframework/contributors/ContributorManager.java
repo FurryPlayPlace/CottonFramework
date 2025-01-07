@@ -54,6 +54,8 @@ public class ContributorManager {
                 Type listType = new TypeToken<List<Contributor>>() {}.getType();
                 List<Contributor> contributors = gson.fromJson(response.toString(), listType);
 
+                connection.disconnect();
+
                 return Optional.of(contributors);
             }
         } catch (Exception ignored) {}

@@ -37,9 +37,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(Block.class)
 public abstract class BlockMixin {
 
-    @Inject(method = "onPlaced", at = @At("HEAD"), cancellable = true)
+    @Inject(
+            method = "onPlaced",
+            at = @At("HEAD"),
+            cancellable = true
+    )
     public void onPlaced(World world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack itemStack, CallbackInfo ci) {
-
         Block placed = state.getBlock();
         Block placedAgainst = world.getBlockState(pos.offset(placer.getHorizontalFacing().getOpposite())).getBlock();
 
@@ -51,7 +54,11 @@ public abstract class BlockMixin {
         if (blockBreakEvent.isCancelled()) ci.cancel();
     }
 
-    @Inject(method = "onDestroyedByExplosion", at = @At("HEAD"), cancellable = true)
+    @Inject(
+            method = "onDestroyedByExplosion",
+            at = @At("HEAD"),
+            cancellable = true
+    )
     public void onExplode(World world, BlockPos pos, Explosion explosion, CallbackInfo ci) {
         Block block = world.getBlockState(pos).getBlock();
 

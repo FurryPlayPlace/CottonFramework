@@ -30,13 +30,22 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class MinecraftServerMixin implements Permissible {
     @Shadow public abstract ServerWorld getOverworld();
 
-    @Inject(method = "stop", at = @At(value = "HEAD"))
+    @Inject(
+            method = "stop",
+            at = @At(value = "HEAD")
+    )
     public void stopServer(CallbackInfo ci) {
         CottonFramework.getInstance().getApi().pluginManager()
                 .getEventBus().post(new CottonPluginShutdown());
     }
 
-    @Inject(method = "prepareStartRegion", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;getOverworld()Lnet/minecraft/server/world/ServerWorld;"))
+    @Inject(
+            method = "prepareStartRegion",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/server/MinecraftServer;getOverworld()Lnet/minecraft/server/world/ServerWorld;"
+            )
+    )
     public void prepareStartRegion(WorldGenerationProgressListener worldGenerationProgressListener, CallbackInfo ci) {
         CottonFramework.getInstance().getApi().pluginManager()
                 .getEventBus().post(new WorldLoadEvent(this.getOverworld()));

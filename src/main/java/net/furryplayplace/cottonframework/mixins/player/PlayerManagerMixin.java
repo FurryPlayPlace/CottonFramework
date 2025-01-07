@@ -27,7 +27,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(PlayerManager.class)
 public class PlayerManagerMixin {
-    @Inject(method = "onPlayerConnect", at = @At("RETURN"))
+    @Inject(
+            method = "onPlayerConnect",
+            at = @At("RETURN")
+    )
     public void onPlayerConnect(ClientConnection connection, ServerPlayerEntity player, ConnectedClientData clientData, CallbackInfo ci) {
         PlayerJoinEvent playerJoinEvent = new PlayerJoinEvent(player);
 

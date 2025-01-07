@@ -37,7 +37,11 @@ import java.util.Optional;
 public class PortalForceMixin {
     @Shadow @Final private ServerWorld world;
 
-    @Inject(method = "createPortal", at = @At("HEAD"), cancellable = true)
+    @Inject(
+            method = "createPortal",
+            at = @At("HEAD"),
+            cancellable = true
+    )
     public void createPortal(BlockPos pos, Direction.Axis axis, CallbackInfoReturnable<Optional<BlockLocating.Rectangle>> cir) {
         PortalCreateEvent portalCreateEvent = new PortalCreateEvent(List.of(
                 Blocks.NETHER_PORTAL.getDefaultState().with(NetherPortalBlock.AXIS, axis)

@@ -57,7 +57,10 @@ public abstract class ServerPlayerEntityMixin implements Permissible {
 
     @Shadow protected abstract boolean isBedObstructed(BlockPos pos, Direction direction);
 
-    @Inject(method = "teleportTo", at = @At(value = "HEAD"))
+    @Inject(
+            method = "teleportTo",
+            at = @At(value = "HEAD")
+    )
     public void onTeleportTo(TeleportTarget teleportTarget, CallbackInfoReturnable<Entity> cir) {
         PlayerEntity player = (PlayerEntity) (Object) this;
         if (player == null) return;
@@ -75,7 +78,11 @@ public abstract class ServerPlayerEntityMixin implements Permissible {
     }
 
 
-    @Inject(method = "teleport(Lnet/minecraft/server/world/ServerWorld;DDDFF)V", at = @At(value = "HEAD"), cancellable = true)
+    @Inject(
+            method = "teleport(Lnet/minecraft/server/world/ServerWorld;DDDFF)V",
+            at = @At(value = "HEAD"),
+            cancellable = true
+    )
     public void onTeleport(ServerWorld targetWorld, double x, double y, double z, float yaw, float pitch, CallbackInfo ci) {
         PlayerEntity player = (PlayerEntity) (Object) this;
         if (player == null) return;
@@ -91,7 +98,10 @@ public abstract class ServerPlayerEntityMixin implements Permissible {
         if (playerTeleportEvent.isCancelled()) ci.cancel();
     }
 
-    @Inject(method = "teleport(Lnet/minecraft/server/world/ServerWorld;DDDLjava/util/Set;FF)Z", at = @At(value = "HEAD"))
+    @Inject(
+            method = "teleport(Lnet/minecraft/server/world/ServerWorld;DDDLjava/util/Set;FF)Z",
+            at = @At(value = "HEAD")
+    )
     public void onTeleport(ServerWorld world, double destX, double destY, double destZ, Set<PositionFlag> flags, float yaw, float pitch, CallbackInfoReturnable<Boolean> cir) {
         PlayerEntity player = (PlayerEntity) (Object) this;
         if (player == null) return;
@@ -116,7 +126,11 @@ public abstract class ServerPlayerEntityMixin implements Permissible {
     }
 
 
-    @Inject(method = "attack", at = @At(value = "RETURN"), cancellable = true)
+    @Inject(
+            method = "attack",
+            at = @At(value = "RETURN"),
+            cancellable = true
+    )
     public void onAttack(Entity target, CallbackInfo ci) {
         PlayerEntity player = (PlayerEntity) (Object) this;
         if (player == null) return;
@@ -130,7 +144,11 @@ public abstract class ServerPlayerEntityMixin implements Permissible {
     }
 
 
-    @Inject(method = "sleep", at = @At(value = "HEAD"), cancellable = true)
+    @Inject(
+            method = "sleep",
+            at = @At(value = "HEAD"),
+            cancellable = true
+    )
     public void onSleep(BlockPos pos, CallbackInfo ci) {
         PlayerEntity player = (PlayerEntity) (Object) this;
         if (player == null) return;
@@ -156,7 +174,11 @@ public abstract class ServerPlayerEntityMixin implements Permissible {
         }
     }
 
-    @Inject(method = "wakeUp", at = @At("HEAD"), cancellable = true)
+    @Inject(
+            method = "wakeUp",
+            at = @At("HEAD"),
+            cancellable = true
+    )
     public void onWakeUp(boolean skipSleepTimer, boolean updateSleepingPlayers, CallbackInfo ci) {
         PlayerEntity player = (PlayerEntity) (Object) this;
         if (player == null) return;
@@ -169,7 +191,10 @@ public abstract class ServerPlayerEntityMixin implements Permissible {
         if (playerBedLeaveEvent.isCancelled()) ci.cancel();
     }
 
-    @Inject(method = "dropItem", at = @At(value = "HEAD"))
+    @Inject(
+            method = "dropItem",
+            at = @At(value = "HEAD")
+    )
     public void onDropItem(ItemStack stack, boolean throwRandomly, boolean retainOwnership, CallbackInfoReturnable<ItemEntity> cir) {
         PlayerEntity player = (PlayerEntity) (Object) this;
         if (player == null) return;
@@ -182,7 +207,10 @@ public abstract class ServerPlayerEntityMixin implements Permissible {
         if (playerDropItemEvent.isCancelled()) cir.cancel();
     }
 
-    @Inject(method = "onDisconnect", at = @At(value = "HEAD"))
+    @Inject(
+            method = "onDisconnect",
+            at = @At(value = "HEAD")
+    )
     public void onDisconnect(CallbackInfo ci) {
         PlayerEntity player = (PlayerEntity) (Object) this;
 
@@ -192,7 +220,10 @@ public abstract class ServerPlayerEntityMixin implements Permissible {
                 .post(new PlayerQuitEvent(player));
     }
 
-    @Inject(method = "onDeath", at = @At("HEAD"))
+    @Inject(
+            method = "onDeath",
+            at = @At("HEAD")
+    )
     public void onDeath(DamageSource source, CallbackInfo ci) {
         PlayerDeathEvent event = new PlayerDeathEvent((ServerPlayerEntity)(Object)this);
         CottonAPI.get().pluginManager().getEventBus().post(event);
