@@ -12,7 +12,6 @@ accessible field net/minecraft/server/network/ServerPlayNetworkHandler lastTickM
 accessible field net/minecraft/server/network/ServerPlayNetworkHandler lastTickRiddenX D
 accessible field net/minecraft/server/network/ServerPlayNetworkHandler lastTickRiddenY D
 accessible field net/minecraft/server/network/ServerPlayNetworkHandler lastTickRiddenZ D
-accessible field net/minecraft/server/network/ServerPlayNetworkHandler connection Lnet/minecraft/network/ClientConnection;
 
 accessible field net/minecraft/server/network/ServerPlayNetworkHandler updatedRiddenX D
 accessible field net/minecraft/server/network/ServerPlayNetworkHandler updatedRiddenY D
