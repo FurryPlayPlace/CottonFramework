@@ -18,6 +18,9 @@ import com.google.common.base.Charsets;
 import lombok.Getter;
 import net.furryplayplace.cottonframework.api.configuration.file.FileConfiguration;
 import net.furryplayplace.cottonframework.api.configuration.file.YamlConfiguration;
+import net.furryplayplace.cottonframework.api.exceptions.PluginFileException;
+import net.furryplayplace.cottonframework.api.exceptions.PluginFileNotFoundException;
+import net.furryplayplace.cottonframework.manager.plugin.CottonClassLoader;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
@@ -28,26 +31,32 @@ import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public abstract class CottonPlugin  {
-
-    private final String name;
-    private final String version;
-    private final List<String> authors;
+public abstract class JavaPlugin {
+    private String name;
+    private String version;
+    private List<String> authors;
     @Getter
     private File dataFolder;
-    private final File configFile;
+    private File configFile;
 
     private FileConfiguration newConfig = null;
 
     @Getter
-    private final Logger logger;
+    private Logger logger;
 
-    public CottonPlugin(String name, String version, List<String> authors) {
+    public JavaPlugin() {
+        final ClassLoader classLoader = this.getClass().getClassLoader();
+        if (!(classLoader instanceof CottonClassLoader)) {
+            throw new IllegalStateException("JavaPlugin requires " + CottonClassLoader.class.getName());
+        }
+    }
+
+    protected JavaPlugin(String name, String version, List<String> authors) {
         this.name = name;
         this.version = version;
         this.authors = authors;
 
-        this.logger = Logger.getLogger(name);
+        this.logger = Logger.getLogger(this.name);
         this.dataFolder = new File("plugins", this.name);
         this.configFile = new File(this.dataFolder, "config.yml");
     }
@@ -58,7 +67,7 @@ public abstract class CottonPlugin  {
 
     public Optional<String> author() {
         if (authors.isEmpty()) return Optional.empty();
-        return Optional.of(authors.getFirst());
+        return Optional.of(authors.get(0));
     }
 
     public abstract void onEnable();

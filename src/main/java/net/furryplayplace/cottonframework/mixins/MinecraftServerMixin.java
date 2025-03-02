@@ -53,15 +53,15 @@ public abstract class MinecraftServerMixin implements Permissible {
 
 
     @Override
-    public boolean hasPermission(Permission id) {
+    public boolean h5$hasPermission(Permission id) {
         return true;
     }
 
     @Override
-    public boolean isHighLevelOperator() {
+    public boolean h5$isHighLevelOperator() {
         return true;
     }
 
     @Override
-    public void setPermission(Permission id, boolean value) {}
+    public void h5$setPermission(Permission id, boolean value) {}
 }

@@ -1,18 +1,10 @@
-/*
----------------------------------------------------------------------------------
-File Name : ClassData
-
-Developer : vakea 
-Email     : vakea@fluffici.eu
-Real Name : Alex Guy Yann Le Roy
-
-Date Created  : 20.12.2024
-Last Modified : 20.12.2024
-
----------------------------------------------------------------------------------
-*/
-
 package net.furryplayplace.cottonframework.manager.plugin.transformers.rebuild;
+
+/**
+ * This class was made by Fox2Code for KibblePatcher
+ *
+ * Thank you a lots, this class is very useful
+ */
 
 public interface ClassData {
     String getName();

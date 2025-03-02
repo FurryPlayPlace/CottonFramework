@@ -14,30 +14,29 @@ Last Modified : 19.12.2024
 
 package net.furryplayplace.cottonframework.manager;
 
-import net.furryplayplace.cottonframework.api.plugin.CottonPlugin;
+import net.furryplayplace.cottonframework.api.configuration.file.FileConfiguration;
+import net.furryplayplace.cottonframework.api.configuration.file.YamlConfiguration;
+import net.furryplayplace.cottonframework.api.exceptions.*;
+import net.furryplayplace.cottonframework.api.plugin.JavaPlugin;
 import net.furryplayplace.cottonframework.api.plugin.PluginContainer;
 import net.furryplayplace.cottonframework.api.plugin.PluginState;
 import com.google.common.eventbus.*;
 import net.furryplayplace.cottonframework.api.command.AbstractCommand;
-import net.furryplayplace.cottonframework.api.exceptions.PluginAlreadyRegisteredExceptions;
-import net.furryplayplace.cottonframework.api.exceptions.PluginNotRegisteredExceptions;
 import net.furryplayplace.cottonframework.api.plugin.interfaces.IPluginManager;
 import net.furryplayplace.cottonframework.manager.plugin.CottonClassLoader;
+import net.minecraft.SharedConstants;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import java.io.Closeable;
-import java.io.File;
+import java.io.*;
 import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-import java.util.jar.Manifest;
 
 import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
 
 public class PluginManager implements IPluginManager {
     private final Logger logger = LogManager.getLogger("PluginManager");
-    private final HashMap<String, PluginContainer<CottonPlugin>> plugins = new HashMap<>();
+    private final HashMap<String, PluginContainer<JavaPlugin>> plugins = new HashMap<>();
     private final List<AbstractCommand> commands = new ArrayList<>();
 
     private final AsyncEventBus eventBus = new AsyncEventBus("CottonEventBus", directExecutor());
@@ -59,8 +58,8 @@ public class PluginManager implements IPluginManager {
      * @param plugin the {@code CottonPlugin} to register.
      */
     @Override
-    public void registerPlugin(CottonPlugin plugin) throws PluginAlreadyRegisteredExceptions {
-        PluginContainer<CottonPlugin> currentPlugin = this.plugins.getOrDefault(plugin.name(), null);
+    public void registerPlugin(JavaPlugin plugin) throws PluginAlreadyRegisteredExceptions {
+        PluginContainer<JavaPlugin> currentPlugin = this.plugins.getOrDefault(plugin.name(), null);
         if (currentPlugin != null)
             throw new PluginAlreadyRegisteredExceptions(plugin.name() + " is already registered and cannot be registered again.");
 
@@ -69,8 +68,6 @@ public class PluginManager implements IPluginManager {
             pluginFile.mkdirs();
             this.logger.info("Created plugin directory for {}.", plugin.name());
         }
-
-
 
         this.plugins.put(plugin.name(), new PluginContainer<>(plugin, PluginState.LOADED));
         this.logger.info("Registered plugin {} ({}) by {}.", plugin.name(), plugin.version(), String.join(", ", plugin.authors()));
@@ -82,8 +79,8 @@ public class PluginManager implements IPluginManager {
      * @param plugin the {@code CottonPlugin} to unregister.
      */
     @Override
-    public void unregisterPlugin(CottonPlugin plugin) throws PluginNotRegisteredExceptions {
-        PluginContainer<CottonPlugin> currentPlugin = this.plugins.getOrDefault(plugin.name(), null);
+    public void unregisterPlugin(JavaPlugin plugin) throws PluginNotRegisteredExceptions {
+        PluginContainer<JavaPlugin> currentPlugin = this.plugins.getOrDefault(plugin.name(), null);
         if (currentPlugin == null)
             throw new PluginNotRegisteredExceptions(plugin.name() + " is not registered.");
 
@@ -100,7 +97,7 @@ public class PluginManager implements IPluginManager {
      * @return the {@code CottonPlugin} with the specified name, or {@code null} if not found.
      */
     @Override
-    public CottonPlugin getPlugin(String name) {
+    public JavaPlugin getPlugin(String name) {
         return this.plugins.getOrDefault(name, null)
                 .getPlugin();
     }
@@ -111,13 +108,13 @@ public class PluginManager implements IPluginManager {
      * @return an array of all registered {@code CottonPlugin} instances.
      */
     @Override
-    public ArrayList<CottonPlugin> getPlugins() {
+    public ArrayList<JavaPlugin> getPlugins() {
         // Anti Concurrent modification list
         return new ArrayList<>(this.plugins.values().stream().map(PluginContainer::getPlugin).toList());
     }
 
     @Override
-    public ArrayList<PluginContainer<CottonPlugin>> getPluginsWithContainer() {
+    public ArrayList<PluginContainer<JavaPlugin>> getPluginsWithContainer() {
         return new ArrayList<>(this.plugins.values().stream().toList());
     }
 
@@ -129,7 +126,7 @@ public class PluginManager implements IPluginManager {
      */
     @Override
     public boolean isPluginEnabled(String name) {
-        PluginContainer<CottonPlugin> currentPlugin = this.plugins.getOrDefault(name, null);
+        PluginContainer<JavaPlugin> currentPlugin = this.plugins.getOrDefault(name, null);
         if (currentPlugin == null)
             return false;
         return currentPlugin.getState() == PluginState.ENABLED;
@@ -142,8 +139,8 @@ public class PluginManager implements IPluginManager {
      * @return {@code true} if the plugin is enabled, otherwise {@code false}.
      */
     @Override
-    public boolean isPluginEnabled(CottonPlugin plugin) {
-        PluginContainer<CottonPlugin> currentPlugin = this.plugins.getOrDefault(plugin.name(), null);
+    public boolean isPluginEnabled(JavaPlugin plugin) {
+        PluginContainer<JavaPlugin> currentPlugin = this.plugins.getOrDefault(plugin.name(), null);
         if (currentPlugin == null)
             return false;
         return currentPlugin.getState() == PluginState.ENABLED;
@@ -156,7 +153,7 @@ public class PluginManager implements IPluginManager {
      */
     @Override
     public void enablePlugin(String name) throws PluginNotRegisteredExceptions {
-        PluginContainer<CottonPlugin> currentPlugin = this.plugins.getOrDefault(name, null);
+        PluginContainer<JavaPlugin> currentPlugin = this.plugins.getOrDefault(name, null);
         if (currentPlugin == null)
             throw new PluginNotRegisteredExceptions(name + " is not registered.");
 
@@ -174,7 +171,7 @@ public class PluginManager implements IPluginManager {
      */
     @Override
     public void disablePlugin(String name) throws PluginNotRegisteredExceptions {
-        PluginContainer<CottonPlugin> currentPlugin = this.plugins.getOrDefault(name, null);
+        PluginContainer<JavaPlugin> currentPlugin = this.plugins.getOrDefault(name, null);
         if (currentPlugin == null)
             throw new PluginNotRegisteredExceptions(name + " is not registered.");
 
@@ -208,7 +205,7 @@ public class PluginManager implements IPluginManager {
      * @param plugin the {@code CottonPlugin} instance to reload.
      */
     @Override
-    public void reloadPlugin(CottonPlugin plugin) {
+    public void reloadPlugin(JavaPlugin plugin) {
         throw new IllegalStateException("Not yet implemented.");
     }
 
@@ -236,7 +233,7 @@ public class PluginManager implements IPluginManager {
      * @param plugin the {@code CottonPlugin} instance to save.
      */
     @Override
-    public void savePlugin(CottonPlugin plugin) {
+    public void savePlugin(JavaPlugin plugin) {
         throw new IllegalStateException("Not yet implemented.");
     }
 
@@ -251,51 +248,84 @@ public class PluginManager implements IPluginManager {
             this.logger.info("Loading plugin {}...", jarFile.getName());
 
             try (JarFile jar = new JarFile(jarFile)) {
-                Manifest manifest = jar.getManifest();
-                if (manifest == null) {
-                    throw new SecurityException("Missing PLUGIN.manifest in: " + jarFile.getName());
+               try (InputStream pluginInfo = jar.getInputStream(jar.getEntry("plugin.yml"))) {
+                   FileConfiguration pluginInfoReader = YamlConfiguration.loadConfiguration(new InputStreamReader(pluginInfo));
+
+                   String pluginName = pluginInfoReader.getString("name");
+                   String version = pluginInfoReader.getString("version");
+                   String mainClass = pluginInfoReader.getString("mainClass");
+                   List<String> authors = pluginInfoReader.getStringList("authors");
+
+                   if (pluginName == null) {
+                       throw new PluginFileException("{pluginClass} the 'name' field cannot be NULL."
+                               .replace("{pluginClass}", jarFile.getAbsolutePath())
+                       );
+                   } else if (version == null) {
+                       throw new PluginFileException("{pluginClass} the 'version' field cannot be NULL."
+                               .replace("{pluginClass}", jarFile.getAbsolutePath())
+                       );
+                   } else if (mainClass == null) {
+                       throw new PluginFileException("{pluginClass} the 'mainClass' field cannot be NULL."
+                               .replace("{pluginClass}", jarFile.getAbsolutePath())
+                       );
+                   }
+
+                   int minApiVersion = pluginInfoReader.getInt("minApiVersion", SharedConstants.getProtocolVersion());
+                   int currentApiVersion = SharedConstants.getProtocolVersion();
+
+                   if (currentApiVersion < minApiVersion) {
+                       throw new PluginIncompatibleApiVersionException("This plugin was made for the api version {madeFor} but is currently running on {runningOn}"
+                               .replace("{madeFor}", String.valueOf(minApiVersion))
+                               .replace("{runningOn}", String.valueOf(currentApiVersion))
+                       );
+                   }
+
+                   for (Enumeration<JarEntry> entries = jar.entries(); entries.hasMoreElements(); ) {
+                       JarEntry entry = entries.nextElement();
+                       if (entry.isDirectory()) continue;
+
+                       String fileName = entry.getName();
+                       if (fileName.contains("..") || fileName.startsWith("/") || fileName.startsWith("\\")) {
+                           throw new SecurityException("Invalid JAR entry detected: " + fileName);
+                       }
+                   }
+
+                   CottonClassLoader pluginClassLoader = CottonClassLoader.createSecureClassLoader(jarFile);
+
+                   PluginContainer<JavaPlugin> currentPlugin = this.plugins.get(pluginName);
+                   if (currentPlugin != null) {
+                       throw new PluginAlreadyRegisteredExceptions("Plugin " + pluginName + " is already registered.");
+                   }
+
+                   Class<?> pluginClass = pluginClassLoader.loadClass(mainClass);
+                   if (!JavaPlugin.class.isAssignableFrom(pluginClass)) {
+                       throw new ClassCastException("Class " + mainClass + " does not extends JavaPlugin.");
+                   }
+
+                   JavaPlugin pluginInstance = (JavaPlugin) pluginClass.getDeclaredConstructor().newInstance(pluginName, version, authors);
+                   this.registerPlugin(pluginInstance);
+                   this.logger.info("Successfully loaded plugin {} version {} by {}.",
+                           pluginInstance.name(),
+                           pluginInstance.version(),
+                           String.join(", ", pluginInstance.authors()));
+               } catch (IOException e) {
+                   throw new PluginFileNotFoundException(e.getMessage());
+               } catch (PluginIncompatibleApiVersionException e) {
+                   throw new PluginIncompatibleApiVersionException(e);
+               } catch (PluginFileException e) {
+                   throw new RuntimeException(e);
+               }
+            } catch (Exception | PluginAlreadyRegisteredExceptions | PluginFileNotFoundException |
+                     PluginIncompatibleApiVersionException e) {
+                if (e instanceof PluginAlreadyRegisteredExceptions) {
+                    this.logger.error("{} is already loaded.", jarFile.getName(), e);
+                } else if (e instanceof PluginFileNotFoundException) {
+                    this.logger.error("Missing `plugin.yml` for {}", jarFile.getName(), e);
+                } else if (e instanceof PluginIncompatibleApiVersionException) {
+                    this.logger.error("Incompatible plugin detected -> {}", jarFile.getName(), e);
+                } else {
+                    this.logger.error("Failed to load plugin {}.", jarFile.getName(), e);
                 }
-
-                String mainClass = manifest.getMainAttributes().getValue("Plugin-Main-Class");
-                if (mainClass == null || mainClass.isBlank()) {
-                    throw new SecurityException("Plugin-Main-Class not specified in Manifest: " + jarFile.getName());
-                }
-
-                String pluginName = manifest.getMainAttributes().getValue("Plugin-Name");
-                if (pluginName == null || pluginName.isBlank()) {
-                    throw new SecurityException("Plugin-Name not specified in Manifest: " + jarFile.getName());
-                }
-
-                for (Enumeration<JarEntry> entries = jar.entries(); entries.hasMoreElements(); ) {
-                    JarEntry entry = entries.nextElement();
-                    if (entry.isDirectory()) continue;
-
-                    String name = entry.getName();
-                    if (name.contains("..") || name.startsWith("/") || name.startsWith("\\")) {
-                        throw new SecurityException("Invalid JAR entry detected: " + name);
-                    }
-                }
-
-                CottonClassLoader pluginClassLoader = CottonClassLoader.createSecureClassLoader(jarFile);
-
-                PluginContainer<CottonPlugin> currentPlugin = this.plugins.get(pluginName);
-                if (currentPlugin != null) {
-                    throw new PluginAlreadyRegisteredExceptions("Plugin " + pluginName + " is already registered.");
-                }
-
-                Class<?> pluginClass = pluginClassLoader.loadClass(mainClass);
-                if (!CottonPlugin.class.isAssignableFrom(pluginClass)) {
-                    throw new ClassCastException("Class " + mainClass + " does not implement CottonPlugin interface.");
-                }
-
-                CottonPlugin pluginInstance = (CottonPlugin) pluginClass.getDeclaredConstructor().newInstance();
-                this.registerPlugin(pluginInstance);
-                this.logger.info("Successfully loaded plugin {} version {} by {}.",
-                        pluginInstance.name(),
-                        pluginInstance.version(),
-                        String.join(", ", pluginInstance.authors()));
-            } catch (Exception | PluginAlreadyRegisteredExceptions e) {
-                this.logger.error("Failed to load plugin {}.", jarFile.getName(), e);
             }
         }
     }
@@ -307,7 +337,7 @@ public class PluginManager implements IPluginManager {
      */
     @Override
     public void loadPlugin(String name) throws PluginNotRegisteredExceptions {
-        PluginContainer<CottonPlugin> pluginContainer = this.plugins.get(name);
+        PluginContainer<JavaPlugin> pluginContainer = this.plugins.get(name);
         if (pluginContainer == null) {
             this.logger.error("Plugin with name {} is not registered.", name);
             throw new PluginNotRegisteredExceptions("Plugin " + name + " is not registered.");
@@ -335,14 +365,14 @@ public class PluginManager implements IPluginManager {
      * @param plugin the {@code CottonPlugin} instance to load.
      */
     @Override
-    public void loadPlugin(CottonPlugin plugin) throws PluginNotRegisteredExceptions {
+    public void loadPlugin(JavaPlugin plugin) throws PluginNotRegisteredExceptions {
         if (plugin == null) {
             this.logger.error("Cannot load a null plugin instance.");
             throw new IllegalArgumentException("Plugin instance cannot be null.");
         }
 
         String pluginName = plugin.name();
-        PluginContainer<CottonPlugin> pluginContainer = this.plugins.get(pluginName);
+        PluginContainer<JavaPlugin> pluginContainer = this.plugins.get(pluginName);
 
         if (pluginContainer == null) {
             this.logger.error("Plugin instance {} is not registered.", pluginName);
@@ -371,7 +401,7 @@ public class PluginManager implements IPluginManager {
     @Override
     public void unloadPlugins() {
         for (String pluginName : this.plugins.keySet()) {
-            PluginContainer<CottonPlugin> pluginContainer = this.plugins.get(pluginName);
+            PluginContainer<JavaPlugin> pluginContainer = this.plugins.get(pluginName);
 
             if (pluginContainer != null) {
                 try {
@@ -398,7 +428,7 @@ public class PluginManager implements IPluginManager {
      *
      * @param pluginContainer the container of the plugin to unload.
      */
-    private void unloadPluginClasses(PluginContainer<CottonPlugin> pluginContainer) {
+    private void unloadPluginClasses(PluginContainer<JavaPlugin> pluginContainer) {
         try {
             ClassLoader pluginClassLoader = pluginContainer.getPlugin().getClass().getClassLoader();
 
@@ -438,7 +468,7 @@ public class PluginManager implements IPluginManager {
      * @param plugin the {@code CottonPlugin} instance to unload.
      */
     @Override
-    public void unloadPlugin(CottonPlugin plugin) {
+    public void unloadPlugin(JavaPlugin plugin) {
 
     }
 
@@ -472,13 +502,13 @@ public class PluginManager implements IPluginManager {
     }
 
     @Override
-    public void registerCommand(CottonPlugin plugin, AbstractCommand command) {
+    public void registerCommand(JavaPlugin plugin, AbstractCommand command) {
         this.commands.add(command);
         this.logger.info("Registered command {} plugin {}", command.getName(), plugin.name());
     }
 
     @Override
-    public void unregisterCommand(CottonPlugin plugin, AbstractCommand command) {
+    public void unregisterCommand(JavaPlugin plugin, AbstractCommand command) {
         this.commands.remove(command);
         this.logger.info("Unregistered command {} plugin {}", command.getName(), plugin.name());
     }

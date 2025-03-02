@@ -64,14 +64,9 @@ Here’s an example of registering a custom game event:
 ```java
 import net.furryplayplace.cottonframework.api.CottonAPI;
 import net.furryplayplace.cottonframework.api.events.player.PlayerJoinEvent;
-import net.furryplayplace.cottonframework.api.plugin.CottonPlugin;
+import net.furryplayplace.cottonframework.api.plugin.JavaPlugin;
 
 public class MyPlugin extends CottonPlugin {
-    
-    public MyPlugin() {
-        super("name", "version", List.of("authors"));
-    }
-    
     @Override
     public void onEnable() {
         System.out.println("Hello World!");
@@ -88,7 +83,7 @@ public class MyPlugin extends CottonPlugin {
 }
 ```
 
-3. Build your mod using `Gradle` and deploy the generated `.jar` file into the `/plugins` folder.
+1. Build your mod using `Gradle` and deploy the generated `.jar` file into the `/plugins` folder.
 
 For a detailed guide, check the [Documentation](https://github.com/FurryPlayPlace/CottonFramework/wiki).
 
@@ -124,10 +119,8 @@ CottonFramework is licensed under the [MIT License](https://github.com/FurryPlay
 ## 🔗 Links
 - **FurryPlayPlace**: [https://www.furryplayplace.net/](https://www.furryplayplace.net)
 - **Fabric MC**: [https://fabricmc.net/](https://fabricmc.net/)
-- **Releases
-  **: [https://github.com/FurryPlayPlace/CottonFramework/releases](https://github.com/FurryPlayPlace/CottonFramework/releases)
-- **Documentation
-  **: [https://github.com/FurryPlayPlace/CottonFramework/wiki](https://github.com/FurryPlayPlace/CottonFramework/wiki)
+- **Releases**: [https://github.com/FurryPlayPlace/CottonFramework/releases](https://github.com/FurryPlayPlace/CottonFramework/releases)
+- **Documentation**: [https://github.com/FurryPlayPlace/CottonFramework/wiki](https://github.com/FurryPlayPlace/CottonFramework/wiki)
 
 ---
 

@@ -140,7 +140,7 @@ public class PermissionCommand implements com.mojang.brigadier.Command<ServerCom
 
         try {
             Permissible permissible = CottonPermissions.getPermissible(cs);
-            if (!permissible.isHighLevelOperator()) {
+            if (!permissible.h5$isHighLevelOperator()) {
                 sendMessage(cs, Formatting.RED, "This command requires operator permission.");
                 return 0;
             }

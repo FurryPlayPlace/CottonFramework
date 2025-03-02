@@ -1,17 +1,3 @@
-/*
----------------------------------------------------------------------------------
-File Name : ClassDataProvider
-
-Developer : vakea 
-Email     : vakea@fluffici.eu
-Real Name : Alex Guy Yann Le Roy
-
-Date Created  : 20.12.2024
-Last Modified : 20.12.2024
-
----------------------------------------------------------------------------------
-*/
-
 package net.furryplayplace.cottonframework.manager.plugin.transformers.rebuild;
 
 import org.objectweb.asm.ClassReader;
@@ -25,6 +11,12 @@ import java.util.*;
 
 import static net.furryplayplace.cottonframework.manager.plugin.transformers.ASMUtils.ASM_BUILD;
 import static org.objectweb.asm.Opcodes.*;
+
+/**
+ * This class was made by Fox2Code for KibblePatcher
+ *
+ * Thank you a lots, this class is very useful
+ */
 
 public class ClassDataProvider {
     private static final ClassLoader BOOTSTRAP_CLASS_LOADER = new SecureClassLoader(null) {};

@@ -89,7 +89,7 @@ public class CottonFramework implements ModInitializer  {
 
         ContributorManager
                 .getContributors()
-                .ifPresent(contributorList -> this.logger.info(" - Contributors: {}", String.join(", ", contributorList.stream().map(ContributorManager.Contributor::getLogin).toList())));
+                .ifPresent(contributorList -> this.logger.info(" - Contributors: {}", String.join(", ", contributorList.stream().map(ContributorManager.Contributor::login).toList())));
 
         this.logger.info("No support will be provided for this framework.");
         this.logger.info("If you want to contribute, please visit https://github.com/FurryPlayPlace/CottonFramework");
@@ -146,7 +146,7 @@ public class CottonFramework implements ModInitializer  {
                     ServerPlayerEntity plr = ss.getPlayer();
                     Permissible p = CottonPermissions.getPlayerPermissible(plr);
                     Permission perm = new Permission(permission, "LuckPerms API provided permission", PermissionDefaults.OPERATOR);
-                    boolean hass = p.hasPermission(perm);
+                    boolean hass = p.h5$hasPermission(perm);
                     if (hass) {
                         return TriState.TRUE;
                     }

@@ -18,7 +18,7 @@ import com.google.common.eventbus.EventBus;
 import net.furryplayplace.cottonframework.api.command.AbstractCommand;
 import net.furryplayplace.cottonframework.api.exceptions.PluginAlreadyRegisteredExceptions;
 import net.furryplayplace.cottonframework.api.exceptions.PluginNotRegisteredExceptions;
-import net.furryplayplace.cottonframework.api.plugin.CottonPlugin;
+import net.furryplayplace.cottonframework.api.plugin.JavaPlugin;
 import net.furryplayplace.cottonframework.api.plugin.PluginContainer;
 
 import java.util.ArrayList;
@@ -35,14 +35,14 @@ public interface IPluginManager extends ICommandManager {
      *
      * @param plugin the {@code CottonPlugin} to register.
      */
-    void registerPlugin(CottonPlugin plugin) throws PluginAlreadyRegisteredExceptions;
+    void registerPlugin(JavaPlugin plugin) throws PluginAlreadyRegisteredExceptions;
 
     /**
      * Unregisters a plugin from the system.
      *
      * @param plugin the {@code CottonPlugin} to unregister.
      */
-    void unregisterPlugin(CottonPlugin plugin) throws PluginNotRegisteredExceptions;
+    void unregisterPlugin(JavaPlugin plugin) throws PluginNotRegisteredExceptions;
 
     /**
      * Retrieves a registered plugin by its name.
@@ -50,14 +50,14 @@ public interface IPluginManager extends ICommandManager {
      * @param name the name of the plugin.
      * @return the {@code CottonPlugin} with the specified name, or {@code null} if not found.
      */
-    CottonPlugin getPlugin(String name);
+    JavaPlugin getPlugin(String name);
 
     /**
      * Retrieves all registered plugins.
      *
      * @return an array of all registered {@code CottonPlugin} instances.
      */
-    ArrayList<CottonPlugin> getPlugins();
+    ArrayList<JavaPlugin> getPlugins();
 
     /**
      * Checks if a plugin is enabled by its name.
@@ -73,7 +73,7 @@ public interface IPluginManager extends ICommandManager {
      * @param plugin the {@code CottonPlugin} instance to check.
      * @return {@code true} if the plugin is enabled, otherwise {@code false}.
      */
-    boolean isPluginEnabled(CottonPlugin plugin);
+    boolean isPluginEnabled(JavaPlugin plugin);
 
     /**
      * Enables a plugin by its name.
@@ -106,7 +106,7 @@ public interface IPluginManager extends ICommandManager {
      *
      * @param plugin the {@code CottonPlugin} instance to reload.
      */
-    void reloadPlugin(CottonPlugin plugin);
+    void reloadPlugin(JavaPlugin plugin);
 
     /**
      * Saves the state of all plugins to persistent storage.
@@ -125,7 +125,7 @@ public interface IPluginManager extends ICommandManager {
      *
      * @param plugin the {@code CottonPlugin} instance to save.
      */
-    void savePlugin(CottonPlugin plugin);
+    void savePlugin(JavaPlugin plugin);
 
     /**
      * Loads all plugins into the system.
@@ -144,7 +144,7 @@ public interface IPluginManager extends ICommandManager {
      *
      * @param plugin the {@code CottonPlugin} instance to load.
      */
-    void loadPlugin(CottonPlugin plugin) throws PluginNotRegisteredExceptions;
+    void loadPlugin(JavaPlugin plugin) throws PluginNotRegisteredExceptions;
 
     /**
      * Unloads all plugins from the system.
@@ -163,7 +163,7 @@ public interface IPluginManager extends ICommandManager {
      *
      * @param plugin the {@code CottonPlugin} instance to unload.
      */
-    void unloadPlugin(CottonPlugin plugin);
+    void unloadPlugin(JavaPlugin plugin);
 
     /**
      * Disables all plugins currently registered in the system.
@@ -179,5 +179,5 @@ public interface IPluginManager extends ICommandManager {
 
     List<AbstractCommand> getCommands();
 
-    ArrayList<PluginContainer<CottonPlugin>> getPluginsWithContainer();
+    ArrayList<PluginContainer<JavaPlugin>> getPluginsWithContainer();
 }

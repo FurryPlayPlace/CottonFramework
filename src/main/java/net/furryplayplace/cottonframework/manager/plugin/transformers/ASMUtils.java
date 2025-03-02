@@ -1,17 +1,3 @@
-/*
----------------------------------------------------------------------------------
-File Name : ASMUtils
-
-Developer : vakea 
-Email     : vakea@fluffici.eu
-Real Name : Alex Guy Yann Le Roy
-
-Date Created  : 20.12.2024
-Last Modified : 20.12.2024
-
----------------------------------------------------------------------------------
-*/
-
 package net.furryplayplace.cottonframework.manager.plugin.transformers;
 
 import org.objectweb.asm.Handle;
@@ -22,6 +8,11 @@ import org.objectweb.asm.tree.*;
 import java.util.*;
 import java.util.function.Predicate;
 
+/**
+ * This class was made by Fox2Code for KibblePatcher
+ *
+ * Thank you a lots, this class is very useful
+ */
 
 public class ASMUtils implements Opcodes {
     public static final int ASM_BUILD = ASM9;
@@ -44,44 +35,26 @@ public class ASMUtils implements Opcodes {
     }
 
     public static int javaVersionFromClassFileVersion(int classFileVersion) {
-        switch (classFileVersion) {
-            default:
-                throw new IllegalArgumentException("Unknown api: " + classFileVersion);
-            case Opcodes.V1_1:
-                return 1;
-            case Opcodes.V1_2:
-                return 2;
-            case Opcodes.V1_3:
-                return 3;
-            case Opcodes.V1_4:
-                return 4;
-            case Opcodes.V1_5:
-                return 5;
-            case Opcodes.V1_6:
-                return 6;
-            case Opcodes.V1_7:
-                return 7;
-            case Opcodes.V1_8:
-                return 8;
-            case Opcodes.V9:
-                return 9;
-            case Opcodes.V10:
-                return 10;
-            case Opcodes.V11:
-                return 11;
-            case Opcodes.V12:
-                return 12;
-            case Opcodes.V13:
-                return 13;
-            case Opcodes.V14:
-                return 14;
-            case Opcodes.V15:
-                return 15;
-            case Opcodes.V16:
-                return 16;
-            case Opcodes.V17:
-                return 17;
-        }
+        return switch (classFileVersion) {
+            case Opcodes.V1_1 -> 1;
+            case Opcodes.V1_2 -> 2;
+            case Opcodes.V1_3 -> 3;
+            case Opcodes.V1_4 -> 4;
+            case Opcodes.V1_5 -> 5;
+            case Opcodes.V1_6 -> 6;
+            case Opcodes.V1_7 -> 7;
+            case Opcodes.V1_8 -> 8;
+            case Opcodes.V9 -> 9;
+            case Opcodes.V10 -> 10;
+            case Opcodes.V11 -> 11;
+            case Opcodes.V12 -> 12;
+            case Opcodes.V13 -> 13;
+            case Opcodes.V14 -> 14;
+            case Opcodes.V15 -> 15;
+            case Opcodes.V16 -> 16;
+            case Opcodes.V17 -> 17;
+            default -> throw new IllegalArgumentException("Unknown api: " + classFileVersion);
+        };
     }
 
     public static boolean hasField(ClassNode classNode,String fieldName) {

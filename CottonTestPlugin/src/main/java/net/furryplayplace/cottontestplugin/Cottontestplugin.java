@@ -1,30 +1,25 @@
 package net.furryplayplace.cottontestplugin;
 
 import com.google.common.eventbus.Subscribe;
-import net.fabricmc.api.ModInitializer;
 import net.furryplayplace.cottonframework.api.CottonAPI;
 import net.furryplayplace.cottonframework.api.events.player.PlayerChatMessageEvent;
 import net.furryplayplace.cottonframework.api.events.player.PlayerCraftRequestEvent;
 import net.furryplayplace.cottonframework.api.events.player.PlayerJoinEvent;
-import net.furryplayplace.cottonframework.api.plugin.CottonPlugin;
+import net.furryplayplace.cottonframework.api.exceptions.PluginFileException;
+import net.furryplayplace.cottonframework.api.exceptions.PluginFileNotFoundException;
+import net.furryplayplace.cottonframework.api.plugin.JavaPlugin;
 import net.furryplayplace.cottonframework.api.events.block.BlockBreakEvent;
 import net.furryplayplace.cottonframework.api.events.block.BlockPlaceEvent;
 
 import net.furryplayplace.cottontestplugin.commands.TestCommand;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.PlayerManager;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
 import java.util.List;
 
-public class Cottontestplugin extends CottonPlugin  {
+public class Cottontestplugin extends JavaPlugin {
 
     private static Cottontestplugin instance;
-
-    public Cottontestplugin() {
-        super("TestPlugin", "1.0.0", List.of("Vakea"));
-    }
 
     @Override
     public void onEnable() {
@@ -37,8 +32,6 @@ public class Cottontestplugin extends CottonPlugin  {
 
     @Override
     public void onDisable() {
-
-
 
     }
 

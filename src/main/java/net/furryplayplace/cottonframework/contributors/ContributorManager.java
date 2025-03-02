@@ -63,11 +63,5 @@ public class ContributorManager {
         return Optional.empty();
     }
 
-
-    @Getter
-    @AllArgsConstructor
-    public static class Contributor {
-        private final String login;
-        private final int contributions;
-    }
+    public record Contributor(String login, int contributions) { }
 }

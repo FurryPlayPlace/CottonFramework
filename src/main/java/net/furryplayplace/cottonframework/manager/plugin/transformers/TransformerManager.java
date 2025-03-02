@@ -44,7 +44,7 @@ public class TransformerManager {
             bytes = transformer.transform(bytes, classDataProvider);
 
             if (logger.isDebugEnabled()) {
-                logger.debug("Applying transformer " + transformer.name() + " to class " + name);
+                logger.debug("Applying transformer {} to class {}", transformer.name(), name);
             }
         }
 

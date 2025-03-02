@@ -1,0 +1,7 @@
+name: CottonTestPlugin
+version: 1.0.0
+authors: ["Vakea"]
+mainClass: net.furryplayplace.cottontestplugin.Cottontestplugin
+
+# Protocol Version is used to determine what Minecraft version your plugin is using.
+minApiVersion: 747

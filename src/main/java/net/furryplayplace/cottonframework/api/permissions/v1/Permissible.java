@@ -2,10 +2,10 @@ package net.furryplayplace.cottonframework.api.permissions.v1;
 
 public interface Permissible {
 
-    public boolean hasPermission(Permission id);
+    public boolean h5$hasPermission(Permission id);
 
-    public boolean isHighLevelOperator();
+    public boolean h5$isHighLevelOperator();
 
-    public void setPermission(Permission id, boolean value);
+    public void h5$setPermission(Permission id, boolean value);
 
 }

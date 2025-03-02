@@ -230,20 +230,20 @@ public abstract class ServerPlayerEntityMixin implements Permissible {
     }
 
     @Override
-    public boolean hasPermission(Permission id) {
+    public boolean h5$hasPermission(Permission id) {
         if (null == cyberPermConfig)
             cyberPermConfig = CottonFramework.getUser((ServerPlayerEntity)(Object)this);
         return cyberPermConfig.hasPermission(id.getPermissionAsString());
     }
 
     @Override
-    public boolean isHighLevelOperator() {
+    public boolean h5$isHighLevelOperator() {
         ServerPlayerEntity e = (ServerPlayerEntity)(Object)this;
         return e.getServer().getPermissionLevel(e.getGameProfile()) >= 1;
     }
 
     @Override
-    public void setPermission(Permission id, boolean value) {
+    public void h5$setPermission(Permission id, boolean value) {
         cyberPermConfig.setPermission(id, value);
     }
 }

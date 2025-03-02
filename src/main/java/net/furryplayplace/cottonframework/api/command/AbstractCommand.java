@@ -16,7 +16,6 @@ package net.furryplayplace.cottonframework.api.command;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
@@ -43,13 +42,6 @@ public abstract class AbstractCommand implements Command<ServerCommandSource>, P
     private final String name;
     private final boolean onlyPlayer;
     private final String permission;
-
-    public static void main(String[] args) {
-        String command = "home owo pwp owo";
-
-
-
-    }
 
     public abstract int execute(CommandContext<ServerCommandSource> context, ServerPlayerEntity sender, String[] args);
 
@@ -88,6 +80,6 @@ public abstract class AbstractCommand implements Command<ServerCommandSource>, P
     public boolean test(ServerCommandSource serverCommandSource) {
         Permissible permissible = CottonPermissions.getPermissible(serverCommandSource.getPlayer());
         if (permissible == null) return false;
-        return permissible.hasPermission(Permission.of("cotton.permissions." + this.permission, "Cotton Framework Auto Generated Permissions"));
+        return permissible.h5$hasPermission(Permission.of("cotton.permissions." + this.permission, "Cotton Framework Auto Generated Permissions"));
     }
 }
